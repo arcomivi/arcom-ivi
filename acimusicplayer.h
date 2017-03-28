@@ -1,9 +1,11 @@
 #ifndef ACIMUSICPLAYER_H
 #define ACIMUSICPLAYER_H
 
+
 #include <QObject>
 #include <QMediaPlayer>
 #include <QMediaPlaylist>
+#include <QMediaMetaData>
 
 #include "aciconfig.h"
 
@@ -28,6 +30,7 @@ Q_SIGNALS:
     void sendTitle(QString);
     void sendProgress(int);
     void songAboutToFinish(); //signal emited when song is about to finish
+    void currentListIndexChanged(int);
 
 public Q_SLOTS:
     void playNext();
@@ -49,9 +52,14 @@ private:
 private Q_SLOTS:
     void stateChanged(QMediaPlayer::State newState);
     void tick(qint64 time);
-    void sourceChanged(QMediaContent);
+    void mediaChanged(QMediaContent);
+    void error(QMediaPlayer::Error);
     void metaStateChanged(QMediaPlayer::MediaStatus newState);
     void aboutToFinish();
+
+    void currentIndexChanged(int);
+    void mediaChanged(int,int);
+    void currentMediaChanged(QMediaContent);
 
 };
 
