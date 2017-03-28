@@ -65,6 +65,7 @@ private:
     ACIMusicPlayer *m_oMusicPlayer;
     QMediaPlaylist *m_musicPlayingPlaylist;
     QList<QMediaContent> m_songList;
+    QList<QMediaContent> m_videoList;
     bool m_bNewPlaylist;
 };
 

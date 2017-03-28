@@ -8,6 +8,7 @@ ACIMedia::ACIMedia(QObject *parent) : QObject(parent){
     m_oMusicPlayer = new ACIMusicPlayer();
     m_musicPlayingPlaylist = new QMediaPlaylist();
     m_songList.clear();
+    m_videoList.clear();
     m_bNewPlaylist = true;
 
     m_iPreviousCurrentListIndex = -1;
@@ -32,6 +33,7 @@ void ACIMedia::loadMedia()
         m_oMediaModel->addItem(Item("MEDIA_RADIO", "Radio", "radio", "folder"));
         m_oMediaModel->addItem(Item("MEDIA_VIDEO", "Video", "video", "folder"));
         m_oMediaModel->addItem(Item("MEDIA_PICTURE", "Pictures", "picture", "folder"));
+        m_oMediaModel->addItem(Item("MEDIA_TV", "TV", "tv", "folder"));
     } else if(m_iMediaType==MEDIA_MUSIC){
         if(m_iMusicType==MUSIC_INITIAL){
             displayInitialMusic();
@@ -157,43 +159,38 @@ void ACIMedia::displayAllSongs(){
     m_songList.clear();
 
     m_oMediaModel->addItem(Item("MEDIA_MUSIC","..","go_back_to_main", "left"));
-//    m_oMediaModel->addItem(Item("SONG", "vertical_horizon", "/home/simon/Music/Vertical_Horizon-Burning_The_Days/12-vertical_horizon-even_now.ogg"));
-//    QUrl url = QUrl::fromLocalFile("/home/simon/Music/Vertical_Horizon-Burning_The_Days/12-vertical_horizon-even_now.ogg");
-//    QMediaContent media(url);
-//    m_songList.append(media);
-//    return;
-    QString music = QDir::homePath() + "/Music";
-    QDir musicDir(music);
-    if(musicDir.exists()){
-        foreach (QString entry, musicDir.entryList()) {
-            qDebug() << entry;
-        }
-        foreach (QFileInfo fileInfo, musicDir.entryInfoList()) {
-            qDebug() << fileInfo.baseName();
-            if (fileInfo.isDir()) {
-                QString song = music + "/" + fileInfo.baseName();
-                foreach (QFileInfo song, QDir(song).entryInfoList()) {
-                    if (song.isDir()) {
-                        continue;
-                    }
-                    qDebug() << "song: " << song.baseName();
-                    qDebug() << "path: " << song.absoluteFilePath();
-                    m_oMediaModel->addItem(Item("SONG", song.baseName(), song.absoluteFilePath()));
 
-                    //build playlist at once
-                    QUrl url = QUrl::fromLocalFile(song.absoluteFilePath());
-                    QMediaContent media(url);
-                    m_songList.append(media);
-                }
-            }
-        }
-    } else {
-        qDebug() << "does not exiswt";
-    }
+    QString music = QDir::homePath() + "/Music";
+//    QDir musicDir(music);
+//    if(musicDir.exists()){
+//        foreach (QString entry, musicDir.entryList()) {
+//            qDebug() << entry;
+//        }
+//        foreach (QFileInfo fileInfo, musicDir.entryInfoList()) {
+//            qDebug() << fileInfo.baseName();
+//            if (fileInfo.isDir()) {
+//                QString song = music + "/" + fileInfo.baseName();
+//                foreach (QFileInfo song, QDir(song).entryInfoList()) {
+//                    if (song.isDir()) {
+//                        continue;
+//                    }
+//                    qDebug() << "song: " << song.baseName();
+//                    qDebug() << "path: " << song.absoluteFilePath();
+//                    m_oMediaModel->addItem(Item("SONG", song.baseName(), song.absoluteFilePath()));
+
+//                    //build playlist at once
+//                    QUrl url = QUrl::fromLocalFile(song.absoluteFilePath());
+//                    QMediaContent media(url);
+//                    m_songList.append(media);
+//                }
+//            }
+//        }
+//    } else {
+//        qDebug() << "does not exiswt";
+//    }
     foreach (const QStorageInfo &storage, QStorageInfo::mountedVolumes()) {
         if (storage.isValid() && storage.isReady()) {
-            qDebug() << "name" << storage.name();
-            qDebug() << "rootpath" << storage.rootPath();
+            qDebug() << "Storage name: " << storage.name() << ", rootpath: " << storage.rootPath();
             music = storage.rootPath() + "/Music";
             QDir musicDir(music);
             if(musicDir.exists()){
@@ -236,9 +233,32 @@ void ACIMedia::displayInitialVideo(){
 void ACIMedia::displayAllVideos(){
     m_oMediaModel->removeRows(0, m_oMediaModel->rowCount());
     m_oMediaModel->addItem(Item("MEDIA_VIDEO","..","go_back_to_main", "left"));
-    m_oMediaModel->addItem(Item("VIDEO", "Wildlife", "C:/temp/Wildlife.wmv"));
-    m_oMediaModel->addItem(Item("VIDEO", "Wildlife", "C:/temp/Wildlife.wmv"));
-    m_oMediaModel->addItem(Item("VIDEO", "Cud Niepamieci", "file:///home/simon/Videos/Cud-niepamięci-cover.mp4"));
-    m_oMediaModel->addItem(Item("VIDEO", "Cud Niepamieci", "file:///home/simon/Videos/Cud-niepamięci-cover.mp4"));
-    m_oMediaModel->addItem(Item("VIDEO", "Cud Niepamieci", "file:///home/simon/Videos/Cud-niepamięci-cover.mp4"));
+    m_videoList.clear();
+
+    foreach (const QStorageInfo &storage, QStorageInfo::mountedVolumes()) {
+        if (storage.isValid() && storage.isReady()) {
+            qDebug() << "Storage name: " << storage.name() << ", rootpath: " << storage.rootPath();
+            QString videoPath = storage.rootPath() + "/Video";
+            QDir videoDir(videoPath);
+            if(videoDir.exists()){
+                foreach (QString entry, videoDir.entryList()) {
+                    qDebug() << entry;
+                }
+
+                foreach (QFileInfo videoFileInfo, QDir(videoDir).entryInfoList()) {
+                    if (videoFileInfo.isDir()) {
+                        continue;
+                    }
+                    qDebug() << "video: " << videoFileInfo.baseName();
+                    qDebug() << "path: " << videoFileInfo.absoluteFilePath();
+                    m_oMediaModel->addItem(Item("VIDEO", videoFileInfo.baseName(), videoFileInfo.absoluteFilePath()));
+
+                    //build playlist at once
+                    QUrl url = QUrl::fromLocalFile(videoFileInfo.absoluteFilePath());
+                    QMediaContent media(url);
+                    m_videoList.append(media);
+                }
+            }
+        }
+    }
 }

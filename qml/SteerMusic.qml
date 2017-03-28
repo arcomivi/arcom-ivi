@@ -6,12 +6,13 @@ Item {
     width: parent.width
     height: parent.height
 
-    property int noOfElements: 7
+    property int noOfElements: 5
     property int m_iCurrent: -1;
     property string m_sPrefix: "css/media/active/10/"
 
     signal goRight
     signal goLeft
+    signal goUp
 
     signal volup
     signal voldown
@@ -33,6 +34,10 @@ Item {
 
     function handleRotCw(){
         console.log("handleRotCw");
+        if(music_progress.borderWidth===1){ //we are on a progress bar
+            return;
+        }
+
         steerMusicRow.children[m_iCurrent].setButtonInactive();
         m_iCurrent++;
         if(m_iCurrent >= noOfElements) m_iCurrent = noOfElements - 1;
@@ -41,10 +46,29 @@ Item {
 
     function handleRotCcw(){
         console.log("handleRotCcw");
+        if(music_progress.borderWidth===1){ //we are on a progress bar
+            return;
+        }
         steerMusicRow.children[m_iCurrent].setButtonInactive();
         m_iCurrent--;
         if(m_iCurrent < 0) m_iCurrent = 0;
         steerMusicRow.children[m_iCurrent].setButtonActive();
+    }
+
+    function handleDirUp(){
+        if(music_progress.borderWidth===1){
+            music_progress.borderWidth=0;
+            handleEnter();
+        } else {
+            goUp();
+        }
+    }
+
+    function handleDirDown(){
+        if(music_progress.borderWidth===0){
+            handleLeave();
+            music_progress.borderWidth=1;
+        }
     }
 
     function setMediaProgress(progr){
@@ -60,23 +84,23 @@ Item {
     function handleRelease(){
         console.log("SteerNavi: handleRelease "+m_iCurrent);
         switch(m_iCurrent){
-        case 1:
+        case 0:
             steerMusicRow.children[m_iCurrent].setButtonReleased();
             rootSteerMusic.volup();
             break;
-        case 2:
+        case 1:
             steerMusicRow.children[m_iCurrent].setButtonReleased();
             rootSteerMusic.voldown();
             break;
-        case 3:
+        case 2:
             steerMusicRow.children[m_iCurrent].setButtonReleased();
             rootSteerMusic.prev();
             break;
-        case 4:
+        case 3:
             steerMusicRow.children[m_iCurrent].setButtonReleased();
             rootSteerMusic.playpause();
             break;
-        case 5:
+        case 4:
             steerMusicRow.children[m_iCurrent].setButtonReleased();
             rootSteerMusic.next();
             break;
@@ -92,29 +116,28 @@ Item {
             width: parent.width
             height: parent.height * 2 / 3;
 
-            ACIButton {
-                width: parent.width / 12
-                height: parent.height
-                id: audio_bt_left
-                objectName: "audio-bt-left"
-                keyUsing: true;
-                opacity: 1
-                pngname: "left"
-                text: ""
-                btnImg: g_cssprefix + m_sPrefix + pngname +".png"
-                btnImgPressed: g_cssprefix + "css/common/inactive/"+pngname+".png"
+//            ACIButton {
+//                width: parent.width / 12
+//                height: parent.height
+//                id: audio_bt_left
+//                objectName: "audio-bt-left"
+//                keyUsing: true;
+//                opacity: 1
+//                pngname: "left"
+//                text: ""
+//                btnImg: g_cssprefix + m_sPrefix + pngname +".png"
+//                btnImgPressed: g_cssprefix + "css/common/inactive/"+pngname+".png"
 
-                function setActive()   { setButtonActive();   }
-                function setInactive() { setButtonInactive(); }
-                function setClicked()  { setButtonClicked(); }
-                onClicked: { rootSteerMusic.goLeft(); wasClicked = false; }
-            }
+//                function setActive()   { setButtonActive();   }
+//                function setInactive() { setButtonInactive(); }
+//                function setClicked()  { setButtonClicked(); }
+//                onClicked: { rootSteerMusic.goLeft(); wasClicked = false; }
+//            }
 
             ACIButton {
-                width: parent.width / 6
+                width: parent.width / noOfElements
                 height: parent.height
                 id: audio_bt_volup
-                //objectName: "audio-bt-volup"
                 keyUsing: true;
                 opacity: 1
                 pngname: "volup"
@@ -128,10 +151,9 @@ Item {
             }
 
             ACIButton {
-                width: parent.width / 6
+                width: parent.width / noOfElements
                 height: parent.height
                 id: audio_bt_voldown
-                //objectName: "audio-bt-voldown"
                 keyUsing: true;
                 opacity: 1
                 pngname: "voldown"
@@ -145,10 +167,9 @@ Item {
             }
 
             ACIButton {
-                width: parent.width / 6
+                width: parent.width / noOfElements
                 height: parent.height
                 id: audio_bt_last
-                //objectName: "audio-bt-last"
                 keyUsing: true;
                 opacity: 1
                 pngname: "last"
@@ -162,10 +183,9 @@ Item {
             }
 
             ACIButton {
-                width: parent.width / 6
+                width: parent.width / noOfElements
                 height: parent.height
                 id: audio_bt_play
-                //objectName: "audio-bt-play"
                 keyUsing: true;
                 opacity: 1
                 pngname: "play"
@@ -179,10 +199,9 @@ Item {
             }
 
             ACIButton {
-                width: parent.width / 6
+                width: parent.width / noOfElements
                 height: parent.height
                 id: audio_bt_next
-                objectName: "audio-bt-next"
                 keyUsing: true;
                 opacity: 1
                 pngname: "next"
@@ -195,23 +214,23 @@ Item {
                 onClicked: { rootSteerMusic.next(); wasClicked = false; }
             }
 
-            ACIButton {
-                width: parent.width / 12
-                height: parent.height
-                id: audio_bt_right
-                objectName: "audio-bt-right"
-                keyUsing: true;
-                opacity: 1
-                pngname: "right"
-                text: ""
-                btnImg: g_cssprefix + "css/common/active/13/"+ pngname +".png"
-                btnImgPressed: g_cssprefix + "css/common/inactive/"+pngname+".png"
+//            ACIButton {
+//                width: parent.width / 12
+//                height: parent.height
+//                id: audio_bt_right
+//                objectName: "audio-bt-right"
+//                keyUsing: true;
+//                opacity: 1
+//                pngname: "right"
+//                text: ""
+//                btnImg: g_cssprefix + "css/common/active/13/"+ pngname +".png"
+//                btnImgPressed: g_cssprefix + "css/common/inactive/"+pngname+".png"
 
-                function setActive()   { setButtonActive();   }
-                function setInactive() { setButtonInactive(); }
-                function setClicked()  { setButtonClicked();  }
-                onClicked: { rootSteerMusic.goRight(); wasClicked = false; }
-            }
+//                function setActive()   { setButtonActive();   }
+//                function setInactive() { setButtonInactive(); }
+//                function setClicked()  { setButtonClicked();  }
+//                onClicked: { rootSteerMusic.goRight(); wasClicked = false; }
+//            }
         }
         ACIProgressBar {
             id: music_progress;

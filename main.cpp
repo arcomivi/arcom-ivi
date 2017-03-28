@@ -1,7 +1,6 @@
 #include <QApplication>
 #include <QGuiApplication>
 #include <QScreen>
-#include <QDesktopWidget>
 #include "globalincludes.h"
 #include "aciconfig.h"
 #include "acimainview.h"

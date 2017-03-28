@@ -19,6 +19,7 @@
 #include <QtMultimedia/QMediaContent>
 #include <QtXml/QXmlDefaultHandler>
 #include <QStorageInfo>
+#include <QDesktopWidget>
 
 #ifdef Q_OS_LINUX
 #include <QtDBus/QDBusConnection>

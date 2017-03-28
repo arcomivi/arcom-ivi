@@ -11,6 +11,7 @@ Item {
     }
 
     function setVideoSource(name){
+        console.log("Video: "+name);
         video.source = name;        
     }
 
@@ -43,7 +44,7 @@ Item {
 
     Video {
         id: video
-        anchors.fill: parent;
+        anchors.fill: parent; anchors.centerIn: parent;
     }
 
     Rectangle {

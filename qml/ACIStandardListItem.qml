@@ -19,7 +19,7 @@ Item {
             text: descr
             font {
                 family: "Helvetica";
-                pixelSize: 13;
+                pixelSize: 15;
                 bold: true
             }
             color: standardListItem.ListView.isCurrentItem ? "#B5C808" : (value2===""?"white": value2 )

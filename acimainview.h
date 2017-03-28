@@ -37,7 +37,7 @@ private:
     bool m_bCtrlFirstRun;
     QString m_sPreviousSignal;
     ACIMedia *m_oMedia;
-    ACIVideoView *m_oVideoView;
+    ACIVideoView *m_oVideoView;    
     QObject *m_oCurrentView;
 };
 

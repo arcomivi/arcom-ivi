@@ -1,3 +1,4 @@
+#include <QApplication>
 #include <QGuiApplication>
 #include <QWindow>
 #include <QMainWindow>
@@ -60,7 +61,12 @@ void ACIMainview::screenSelected(int screen){
         connect((QObject*)m_oVideoView->rootObject(), SIGNAL(exitVideo()), this , SLOT(exitVideo()));
 
     }
-    m_oVideoView->setGeometry(650,150,640,480);
+
+    QDesktopWidget *desktopWidget = QApplication::desktop();
+    m_oVideoView->setGeometry(ACIConfig::instance()->getx(),
+                              ACIConfig::instance()->gety(),
+                              ACIConfig::instance()->getw()==0?desktopWidget->screenGeometry(0).width():ACIConfig::instance()->getw(),
+                              ACIConfig::instance()->geth()==0?desktopWidget->screenGeometry(0).height():ACIConfig::instance()->geth());
     m_oVideoView->show();
     m_oVideoView->setScreen(qApp->screens()[screen]);
 }

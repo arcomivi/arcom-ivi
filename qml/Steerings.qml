@@ -3,7 +3,7 @@ import QtQuick 2.5
 Rectangle {
     id: steerings    
     color: Qt.rgba(0.0, 0.0, 0.0, 0.0)
-//    property string g_cssprefix
+
     property Item currentSteering
 
     signal backToPrevious
@@ -67,8 +67,11 @@ Rectangle {
     }
 
     function handleDirUp(){
-        handleLeave();
-        steerings.backToPrevious();
+        currentSteering.handleDirUp();
+
+    }
+    function handleDirDown(){
+        currentSteering.handleDirDown();
     }
 
     function handleRot(direction){
@@ -150,7 +153,7 @@ Rectangle {
         id: steerSwitcher
 
         width: parent.width
-        height: parent.height-1
+        height: parent.height
 
         pages: [
             //0
@@ -164,6 +167,10 @@ Rectangle {
                 onPlaypause: steerings.playpauseMusic();
                 onNext: steerings.nextMusic();
                 onSeek: steerings.seekMusic(percentage);
+                onGoUp: {
+                    handleLeave();
+                    steerings.backToPrevious();
+                }
             },
 
 //            //1
