@@ -7,7 +7,7 @@ Item {
 
     // ==> properties
     property int m_current: -1
-    property string g_cssprefix: Qt.platform.os==="windows"?"file:///C:/Qt/ws/arcom-ivi/arcom-ivi/":"/usr/share/arcomivi/";
+    property string g_cssprefix: Qt.platform.os==="windows"?"file:///D:/temp/ws/arcomivi/arcomivi/":"/usr/share/arcomivi/";
 
     signal update
     signal restart

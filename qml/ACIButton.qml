@@ -75,7 +75,7 @@ Item {
 //        color: buttonRoot.borderColor
         border.color: "orange"
         border.width: borderWidth;
-        radius: 2
+        radius: 0
     }
 
     MouseArea {
