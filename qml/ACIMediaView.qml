@@ -48,6 +48,8 @@ Item {
         rotateCW();
     }
 
+    Rectangle { id: acimediaviewbackground; anchors.fill: parent; color: "#636363" }
+
     ListView {
         id: list;
         width: Math.floor(parent.width);

@@ -8,20 +8,12 @@ Item {
     property int noOfElements: 4
     property string btnPrefix: "internet-bt-"
     property int m_current: -1
-//    property string g_cssprefix
 
     // ==> signals
     signal enterMedia
     signal enterNavigation
     signal enterSync
     signal enterSettings
-
-
-    // ==> functions
-//    function setGeometry(vwidth, vheight){
-//        rootMainMenu.width = vwidth-1;
-//        rootMainMenu.height = vheight-1;
-//    }
 
     function setCssPrefix(prefix){
         g_cssprefix = prefix;
