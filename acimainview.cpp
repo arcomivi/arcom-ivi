@@ -24,6 +24,7 @@ void ACIMainview::setQmlFile(QString qml){
     connect(m_oMedia, SIGNAL(mediaChanged()), this , SLOT(loadMedia()));
     connect(m_oMedia, SIGNAL(sendProgress(int)), this , SLOT(sendProgress(int)));
     connect(m_oMedia, SIGNAL(watchVideo(QString)), this , SLOT(watchVideo(QString)));
+    connect(m_oMedia, SIGNAL(tickSongPosition(QString)), this, SLOT(tickSongPosition(QString)));
 
     //signals from QML UI:
     QObject::connect((QObject*)this->rootObject(), SIGNAL(volup()), m_oMedia , SLOT(volup()));
@@ -75,6 +76,11 @@ void ACIMainview::screenSelected(int screen){
 void ACIMainview::exitVideo(){
     m_oVideoView->destroy();
     m_oVideoView = 0;
+}
+
+void ACIMainview::tickSongPosition(QString tick)
+{
+    QMetaObject::invokeMethod((QObject*)this->rootObject(), "tickSongPosition", Q_ARG(QVariant, tick));
 }
 
 void ACIMainview::keyPressEvent(QKeyEvent *e){

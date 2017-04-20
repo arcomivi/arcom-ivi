@@ -16,6 +16,7 @@ ACIMedia::ACIMedia(QObject *parent) : QObject(parent){
     connect(m_oMediaModel, SIGNAL(itemClicked(Item)), this, SLOT(mediaModelClicked(Item)));
 
     connect(m_oMusicPlayer, SIGNAL(sendProgress(int)), this, SIGNAL(sendProgress(int)));
+    connect(m_oMusicPlayer, SIGNAL(tickSongPosition(QString)), this, SIGNAL(tickSongPosition(QString)));
     connect(m_oMusicPlayer, SIGNAL(currentListIndexChanged(int)), this, SLOT(currentListIndexChanged(int)));
 }
 
@@ -57,7 +58,12 @@ void ACIMedia::volup(){
 void ACIMedia::voldown(){
     m_oMusicPlayer->volumeDown();
 }
-
+/**
+ * @brief ACIMedia::currentListIndexChanged
+ * @param listIndex
+ *
+ *
+ */
 void ACIMedia::currentListIndexChanged(int listIndex){
 
     if(m_iMediaType!=MEDIA_MUSIC && m_iMusicType!=MUSIC_ALL_SONGS){
@@ -76,10 +82,16 @@ void ACIMedia::currentListIndexChanged(int listIndex){
     }
 }
 
+
+//!
+//! \brief ACIMedia::mediaModelClicked
+//! \param itemClicked
+//!
 void ACIMedia::mediaModelClicked(Item itemClicked){
-    TRACE(QString("Name: %1").arg(itemClicked.name()));
-    TRACE(QString("Descr: %1").arg(itemClicked.descr()));
-    TRACE(QString("Value: %1").arg(itemClicked.value()));
+    TRACE(QString("Name: %1, Descr: %2, Value: %3")
+          .arg(itemClicked.name())
+          .arg(itemClicked.descr())
+          .arg(itemClicked.value()));
 
     QString name = itemClicked.name();
     if(name.compare("MEDIA_INITIAL")==0){

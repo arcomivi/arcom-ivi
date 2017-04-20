@@ -21,7 +21,12 @@ Item {
     signal screenSelected(int screen)
 
 
+
     //  ==> functions
+    function tickSongPosition(tick){
+        statusBar.setTime(tick);
+    }
+
     function chooseScreen(){
         console.log("chooseScreen..........................");
         m_current = 5;

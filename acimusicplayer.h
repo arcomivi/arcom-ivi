@@ -26,7 +26,7 @@ Q_SIGNALS:
     void invalidMedia(QString);
     void sourceChanged(QString, QString, QString, QString);
     void noMedia();
-    void tickSong(QString);
+    void tickSongPosition(QString);
     void sendTitle(QString);
     void sendProgress(int);
     void songAboutToFinish(); //signal emited when song is about to finish
@@ -55,7 +55,11 @@ private Q_SLOTS:
     void mediaChanged(QMediaContent);
     void error(QMediaPlayer::Error);
     void metaStateChanged(QMediaPlayer::MediaStatus newState);
+    void metaDataAvailableChanged(bool changed);
+    void metaDataChanged();
+    void metaDataChanged(QString name, QVariant value);
     void aboutToFinish();
+
 
     void currentIndexChanged(int);
     void mediaChanged(int,int);

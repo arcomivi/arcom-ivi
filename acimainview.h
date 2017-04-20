@@ -9,6 +9,8 @@
 class ACIMainview : public QQuickView
 {
     Q_OBJECT
+//    Q_PROPERTY(QString text READ text WRITE setText NOTIFY textChanged)
+    Q_PROPERTY(QString tick NOTIFY onTickSongPosition)
 public:
     explicit ACIMainview(QQuickView *parent = 0);
     void setQmlFile(QString qml);
@@ -17,6 +19,7 @@ public:
 Q_SIGNALS:
     void navigateToWidget(int);
     void navigateToPreviousWidget();
+
 
 public slots:
     void onBroadcastCtrlEvent(QString event);
@@ -29,6 +32,7 @@ public slots:
     void watchVideo(QString);
     void screenSelected(int);
     void exitVideo();
+    void tickSongPosition(QString tick);
 
 
 private:

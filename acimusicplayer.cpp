@@ -14,6 +14,10 @@ ACIMusicPlayer::ACIMusicPlayer(QObject *parent) :
     connect(m_oPlayer, SIGNAL(mediaStatusChanged(QMediaPlayer::MediaStatus)), this, SLOT(metaStateChanged(QMediaPlayer::MediaStatus)));
     connect(m_oPlayer, SIGNAL(mediaChanged(QMediaContent)), this, SLOT(mediaChanged(QMediaContent)));
     connect(m_oPlayer, SIGNAL(error(QMediaPlayer::Error)), this, SLOT(error(QMediaPlayer::Error)));
+    connect(m_oPlayer, SIGNAL(metaDataAvailableChanged(bool)), this, SLOT(metaDataAvailableChanged(bool)));
+
+    connect(m_oPlayer, SIGNAL(metaDataChanged()), this, SLOT(metaDataChanged()));
+    connect(m_oPlayer, SIGNAL(metaDataChanged(QString,QVariant)), this, SLOT(metaDataChanged(QString,QVariant)));
 
     m_bPlaylistChanged=false;
     volumeStep = 10;
@@ -24,10 +28,10 @@ ACIMusicPlayer::ACIMusicPlayer(QObject *parent) :
  *
  */
 void ACIMusicPlayer::tick(qint64 time){
-    //TRACE(QString("enter %1").arg(time));
+    TRACE(QString("enter %1").arg(time));
     //===> get time
     QTime displayTime(0,(int) ((time / 60000) % 60), (int)((time / 1000) % 60));
-    emit tickSong(displayTime.toString("mm:ss"));
+    emit tickSongPosition(displayTime.toString("mm:ss"));
 
     //===> get percentage
     qint64 totalTime = m_oPlayer->duration();
@@ -65,6 +69,7 @@ void ACIMusicPlayer::setPlaylistIndex(int index){
 void ACIMusicPlayer::setPlaylist(QMediaPlaylist *playlist){
     m_bPlaylistChanged=true;
     m_oPlayer->setPlaylist(playlist);
+    m_oPlayer->playlist()->disconnect();
     connect(m_oPlayer->playlist(), SIGNAL(currentIndexChanged(int)), this, SLOT(currentIndexChanged(int)));
     connect(m_oPlayer->playlist(), SIGNAL(mediaChanged(int,int)), this, SLOT(mediaChanged(int,int)));
     connect(m_oPlayer->playlist(), SIGNAL(currentMediaChanged(QMediaContent)), this, SLOT(currentMediaChanged(QMediaContent)));
@@ -117,6 +122,28 @@ void ACIMusicPlayer::metaStateChanged(QMediaPlayer::MediaStatus newState){
     }
 }
 
+//!
+//! \brief ACIMusicPlayer::metaDataAvailableChanged
+//! \param changed
+//!
+void ACIMusicPlayer::metaDataAvailableChanged(bool changed){
+    TRACE(QString("%1").arg(changed));
+    if (changed){
+        qDebug() << m_oPlayer->availableMetaData();
+        qDebug() << m_oPlayer->metaData(QMediaMetaData::AlbumArtist).toString();
+        qDebug() << m_oPlayer->metaData(QMediaMetaData::Title).toString();
+    }
+}
+
+void ACIMusicPlayer::metaDataChanged(){
+    TRACE(QString("enter"));
+    qDebug() <<  qobject_cast<QMediaObject*>(sender())->availableMetaData();
+}
+
+void ACIMusicPlayer::metaDataChanged(QString name, QVariant value){
+    TRACE(QString("enter %1, %2").arg(name).arg(value.toString()));
+}
+
 /**
  * Signals that the current playing content will be obtained from media.
  */
@@ -130,6 +157,7 @@ void ACIMusicPlayer::mediaChanged(QMediaContent source){
         QString path = source.canonicalUrl().path();
         emit sourceChanged(title, albumartist, albumtitle, path);
     }
+
     TRACE("exit");
 }
 
@@ -168,6 +196,9 @@ void ACIMusicPlayer::mediaChanged(int start, int end)
 
 void ACIMusicPlayer::currentMediaChanged(QMediaContent mediaContent){
     TRACE(QString("currentMediaChanged: %0 ").arg(mediaContent.canonicalUrl().toString()));
+    qDebug() << "available: " << m_oPlayer->availableMetaData();
+    qDebug() << m_oPlayer->metaData(QMediaMetaData::AlbumArtist).toString();
+    qDebug() << m_oPlayer->metaData(QMediaMetaData::Title).toString();
 }
 
 
@@ -181,7 +212,7 @@ void ACIMusicPlayer::stopPlayback(){
     if(wasPlaying){
         m_oPlayer->stop();
         emit sendTitle(" ### ");
-        emit tickSong("00:00");
+        emit tickSongPosition("00:00");
         emit sendProgress(0);
     }
 }
@@ -204,7 +235,7 @@ void ACIMusicPlayer::playPause(int index){
         m_oPlayer->stop();
         m_oPlayer->playlist()->setCurrentIndex(index);
         m_oPlayer->play();
-        emit tickSong("00:00");
+        emit tickSongPosition("00:00");
         emit sendProgress(0);
         return;
     }
@@ -228,7 +259,7 @@ void ACIMusicPlayer::playPause(int index){
         TRACE("neither playing nor paused");
         m_oPlayer->stop();
         m_oPlayer->play();
-        emit tickSong("00:00");
+        emit tickSongPosition("00:00");
         emit sendProgress(0);
     }
 }

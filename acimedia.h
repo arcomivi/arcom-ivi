@@ -23,6 +23,7 @@ public:
 signals:
     void mediaChanged();
     void sendProgress(int);
+    void tickSongPosition(QString);
     void watchVideo(QString video);
 
 public slots:
