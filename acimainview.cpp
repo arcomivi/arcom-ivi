@@ -17,20 +17,16 @@ void ACIMainview::setQmlFile(QString qml){
     m_oMedia = new ACIMedia();
     m_oVideoView = 0;
 
+    //context properties must be loaded before loading the QML, if possible ;-)
+    this->rootContext()->setContextProperty("$media", m_oMedia);
     this->setSource(QUrl(qml));
+
     m_oCurrentView = (QObject*)this->rootObject();
 
     //signals from objects:
-    connect(m_oMedia, SIGNAL(mediaChanged()), this , SLOT(loadMedia()));
-    connect(m_oMedia, SIGNAL(sendProgress(int)), this , SLOT(sendProgress(int)));
-    connect(m_oMedia, SIGNAL(watchVideo(QString)), this , SLOT(watchVideo(QString)));
-    connect(m_oMedia, SIGNAL(tickSongPosition(QString)), this, SLOT(tickSongPosition(QString)));
 
     //signals from QML UI:
-    QObject::connect((QObject*)this->rootObject(), SIGNAL(volup()), m_oMedia , SLOT(volup()));
-    QObject::connect((QObject*)this->rootObject(), SIGNAL(voldown()), m_oMedia , SLOT(voldown()));
     QObject::connect((QObject*)this->rootObject(), SIGNAL(screenSelected(int)), this , SLOT(screenSelected(int)));
-    QObject::connect((QObject*)this->rootObject(), SIGNAL(loadMedia()), this , SLOT(loadMedia()));
     QObject::connect((QObject*)this->rootObject(), SIGNAL(update()), this , SLOT(updateMe()));
     QObject::connect((QObject*)this->rootObject(), SIGNAL(navigateTo(int)), this , SLOT(navigateTo(int)));
 
@@ -38,29 +34,15 @@ void ACIMainview::setQmlFile(QString qml){
     QTimer::singleShot(500, ACIUsbController::getInstance(), SLOT(connectCtrlSignal()));
 }
 
-void ACIMainview::loadMedia(){
-    m_oMedia->loadMedia();
-    this->rootContext()->setContextProperty(QLatin1String("listModel"), QVariant::fromValue(m_oMedia->getModel()));
-}
-
-void ACIMainview::sendProgress(int progress){
-    QMetaObject::invokeMethod((QObject*)this->rootObject(), "sendProgress", Q_ARG(QVariant, progress));
-}
-
-void ACIMainview::watchVideo(QString video){
-    QMetaObject::invokeMethod((QObject*)this->rootObject(), "chooseScreen", Qt::DirectConnection);
-}
-
 void ACIMainview::screenSelected(int screen){
     if(!m_oVideoView){
-        m_oVideoView  = new ACIVideoView();
+        m_oVideoView = new ACIVideoView();
         m_oVideoView->setQmlFile(ACIConfig::instance()->getQmlPrefix()+"ACIVideoView.qml");
         m_oVideoView->setFlags(Qt::FramelessWindowHint);
         m_oVideoView->setResizeMode(QQuickView::SizeRootObjectToView);
         m_oVideoView->m_sCurrentVideo = m_oMedia->getCurrentVideo();
 
         connect((QObject*)m_oVideoView->rootObject(), SIGNAL(exitVideo()), this , SLOT(exitVideo()));
-
     }
 
     QDesktopWidget *desktopWidget = QApplication::desktop();
@@ -76,11 +58,6 @@ void ACIMainview::screenSelected(int screen){
 void ACIMainview::exitVideo(){
     m_oVideoView->destroy();
     m_oVideoView = 0;
-}
-
-void ACIMainview::tickSongPosition(QString tick)
-{
-    QMetaObject::invokeMethod((QObject*)this->rootObject(), "tickSongPosition", Q_ARG(QVariant, tick));
 }
 
 void ACIMainview::keyPressEvent(QKeyEvent *e){
@@ -126,6 +103,66 @@ void ACIMainview::keyPressEvent(QKeyEvent *e){
     }
 
     QQuickView::keyPressEvent(e);
+}
+
+void ACIMainview::mousePressEvent(QMouseEvent *e)
+{
+    qDebug() << "e->button(): " << e->button();
+    if(e->button()==Qt::NoButton     ) {qDebug() << "button:NoButton      " << e->button(); }
+    if(e->button()==Qt::AllButtons   ) {qDebug() << "button:AllButtons    " << e->button(); }
+    if(e->button()==Qt::LeftButton   ) {qDebug() << "button:LeftButton    " << e->button(); }
+    if(e->button()==Qt::RightButton  ) {qDebug() << "button:RightButton   " << e->button(); }
+    if(e->button()==Qt::MidButton    ) {qDebug() << "button:MidButton     " << e->button(); }
+    if(e->button()==Qt::MiddleButton ) {qDebug() << "button:MiddleButton  " << e->button(); }
+    if(e->button()==Qt::BackButton   ) {qDebug() << "button:BackButton    " << e->button(); }
+    if(e->button()==Qt::XButton1     ) {qDebug() << "button:XButton1      " << e->button(); }
+    if(e->button()==Qt::ExtraButton1 ) {qDebug() << "button:ExtraButton1  " << e->button(); }
+    if(e->button()==Qt::ForwardButton) {qDebug() << "button:ForwardButton " << e->button(); }
+    if(e->button()==Qt::XButton2     ) {qDebug() << "button:XButton2      " << e->button(); }
+    if(e->button()==Qt::ExtraButton2 ) {qDebug() << "button:ExtraButton2  " << e->button(); }
+    if(e->button()==Qt::TaskButton   ) {qDebug() << "button:TaskButton    " << e->button(); }
+    if(e->button()==Qt::ExtraButton3 ) {qDebug() << "button:ExtraButton3  " << e->button(); }
+    if(e->button()==Qt::ExtraButton4 ) {qDebug() << "button:ExtraButton4  " << e->button(); }
+    if(e->button()==Qt::ExtraButton5 ) {qDebug() << "button:ExtraButton5  " << e->button(); }
+    if(e->button()==Qt::ExtraButton6 ) {qDebug() << "button:ExtraButton6  " << e->button(); }
+    if(e->button()==Qt::ExtraButton7 ) {qDebug() << "button:ExtraButton7  " << e->button(); }
+    if(e->button()==Qt::ExtraButton8 ) {qDebug() << "button:ExtraButton8  " << e->button(); }
+    if(e->button()==Qt::ExtraButton9 ) {qDebug() << "button:ExtraButton9  " << e->button(); }
+    if(e->button()==Qt::ExtraButton10) {qDebug() << "button:ExtraButton10 " << e->button(); }
+    if(e->button()==Qt::ExtraButton11) {qDebug() << "button:ExtraButton11 " << e->button(); }
+    if(e->button()==Qt::ExtraButton12) {qDebug() << "button:ExtraButton12 " << e->button(); }
+    if(e->button()==Qt::ExtraButton13) {qDebug() << "button:ExtraButton13 " << e->button(); }
+    if(e->button()==Qt::ExtraButton14) {qDebug() << "button:ExtraButton14 " << e->button(); }
+    if(e->button()==Qt::ExtraButton15) {qDebug() << "button:ExtraButton15 " << e->button(); }
+    if(e->button()==Qt::ExtraButton16) {qDebug() << "button:ExtraButton16 " << e->button(); }
+    if(e->button()==Qt::ExtraButton17) {qDebug() << "button:ExtraButton17 " << e->button(); }
+    if(e->button()==Qt::ExtraButton18) {qDebug() << "button:ExtraButton18 " << e->button(); }
+    if(e->button()==Qt::ExtraButton19) {qDebug() << "button:ExtraButton19 " << e->button(); }
+    if(e->button()==Qt::ExtraButton20) {qDebug() << "button:ExtraButton20 " << e->button(); }
+    if(e->button()==Qt::ExtraButton21) {qDebug() << "button:ExtraButton21 " << e->button(); }
+    if(e->button()==Qt::ExtraButton22) {qDebug() << "button:ExtraButton22 " << e->button(); }
+    if(e->button()==Qt::ExtraButton23) {qDebug() << "button:ExtraButton23 " << e->button(); }
+    if(e->button()==Qt::ExtraButton24) {qDebug() << "button:ExtraButton24 " << e->button(); }
+
+    if(e->button()==Qt::MouseButton::MidButton || e->button()==Qt::MouseButton::MiddleButton){
+        qDebug() << "Qt::MidButton";
+        QMetaObject::invokeMethod((QObject*)this->rootObject(), "handleRelease", Qt::DirectConnection);
+        return;
+    }
+    QQuickView::mousePressEvent(e);
+}
+
+void ACIMainview::wheelEvent(QWheelEvent *e)
+{
+    qDebug() << "e->delta(): " << e->delta();
+    if(e->delta()==120){
+        QMetaObject::invokeMethod(m_oCurrentView, "handleRot", Qt::DirectConnection, Q_ARG(QVariant, 0));
+        return;
+    } else if(e->delta() == -120) {
+        QMetaObject::invokeMethod(m_oCurrentView, "handleRot", Qt::DirectConnection, Q_ARG(QVariant, 1));
+        return;
+    }
+    QQuickView::wheelEvent(e);
 }
 
 void ACIMainview::onBroadcastCtrlEvent(QString event){

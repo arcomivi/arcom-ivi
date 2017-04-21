@@ -37,9 +37,10 @@ Item {
             video.seek(video.position - 2000)
         }
     }
-    Timer { id: videoSteeringTimer; repeat: false; interval: 3000;
+    Timer { id: videoSteeringTimer; repeat: false; interval: 4000;
         onTriggered: videoSteering.visible = false;
     }
+
     Rectangle { anchors.fill: parent; color: "black" }
 
     Video {
@@ -52,7 +53,7 @@ Item {
         color: Qt.rgba(0.0,0.0,0.0,0.8);
 
         Text {
-            id: foo
+            id: videoSteeringText
             renderType: Text.NativeRendering
             text: qsTr("Steering Video");
             color: "white"
@@ -70,7 +71,7 @@ Item {
             console.log("parent video clicked")
             videoSteering.visible = true;
             videoSteeringTimer.restart();
-            video.playbackState == MediaPlayer.PlayingState ? video.pause() : video.play();
+//            video.playbackState == MediaPlayer.PlayingState ? video.pause() : video.play();
         }
     }
 }

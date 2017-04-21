@@ -1,8 +1,9 @@
 import QtQuick 2.5
+import QtQml 2.2
 
 Item {
     id: rootStatusBar
-
+    property var locale: Qt.locale();
     property string g_cssprefix
 
     function btDiscovering(flag){
@@ -44,22 +45,14 @@ Item {
 
     function setCtrlActive(){
         img_ctrl.source = g_cssprefix + "css/common/active/icon_controller_active.png"
-    }
+    }    
 
-    function setTime(time){
-        txt_song_time.text = time;
-    }
-
-    function setProgress(progress){
-        mediaProgress.width = rootStatusBar_rect.width * ( progress / 100 );
-    }
-
-    function setAlbumArtist(albumArtist){
-        txt_album_artist.text = albumArtist;
-    }
-
-    function setClock(clock){
-        txt_time.text = clock;
+    Timer {
+        running: true
+        repeat: true
+        onTriggered: {
+            txt_time.text = (new Date()).toLocaleTimeString(locale, "hh:mm:ss");
+        }
     }
 
     Rectangle {
@@ -74,7 +67,7 @@ Item {
         }
         Text {
             id: txt_song_time
-            text: "00:00"
+            text: $media.songPosition
             color: "black"
             renderType: Text.NativeRendering
             font {
@@ -91,7 +84,7 @@ Item {
         Text {
             id: txt_album_artist
             renderType: Text.NativeRendering
-            text: "<artist> - <album/song>"
+            text: $media.songTitle
             font.bold: true
             font.family: "Helvetica"
             anchors.left: txt_song_time.right
@@ -114,7 +107,7 @@ Item {
         Text {
             id: txt_time
             renderType: Text.NativeRendering
-            text: "10:43"
+            text: ""
             anchors.right: img_gps.left
             anchors.rightMargin: 5
             font.bold: true

@@ -23,15 +23,18 @@ Item {
 
 
     //  ==> functions
-    function tickSongPosition(tick){
-        statusBar.setTime(tick);
+    Connections {
+        target: $media
+        onWatchVideo:{
+            console.log("chooseScreen..........................");
+            m_current = 5;
+            genericLoader.source = "";
+            genericLoader.source = "ACISelectScreen.qml";
+        }
     }
 
     function chooseScreen(){
-        console.log("chooseScreen..........................");
-        m_current = 5;
-        genericLoader.source = "";
-        genericLoader.source = "ACISelectScreen.qml";
+
     }
 
     function watchVideo(name){
@@ -134,7 +137,7 @@ Item {
         }
 
         function enterMedia(){
-            loadMedia();
+            $media.loadMedia();
             viewsSwitcher.goToView(1, "ACIMediaView.qml");
             viewSteerings.goToSteering(0);
         }
@@ -216,8 +219,8 @@ Item {
             bottom: statusBar.top;
         }
 
-        onVolup: mainview.volup();
-        onVoldown: mainview.voldown();
+        onVolup: $media.volup();
+        onVoldown: $media.voldown();
         onPrevMusic: mediaViewLoader.item.handlePrevious();
         onPlaypauseMusic: mediaViewLoader.item.handleRelease();
         onNextMusic: mediaViewLoader.item.handleNext();
@@ -234,6 +237,7 @@ Item {
             bottom: mainview.bottom;
         }
     }
+
     //(m_current === 4)
     Loader { id: videoLoader; anchors.fill: parent;
         function handleRot(direction){

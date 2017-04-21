@@ -37,8 +37,8 @@ Item {
 //        PluginParameter { name: "osm.mapping.host"; value: "http://a.tile.openstreetmap.org/" }
         //PluginParameter { name: "osm.mapping.host"; value: "http://c.tile.thunderforest.com/outdoors/" }
         PluginParameter { name: "osm.mapping.copyright"; value: "ArCom-IVI" }
-        PluginParameter { name: "osm.mapping.cache.directory"; value:  "/home/simon/Development/osmcache" }
-        PluginParameter { name: "osm.mapping.offline.directory"; value: "/home/simon/Development/osmcache" }
+        PluginParameter { name: "osm.mapping.cache.directory"; value:  "file://D:/temp" } ///home/simon/Development/osmcache
+        PluginParameter { name: "osm.mapping.offline.directory"; value: "file://D:/temp" }
     }
 
     Map {
@@ -50,7 +50,7 @@ Item {
 //            latitude: -27
 //            longitude: 153
 //        }
-        zoomLevel: map.maximumZoomLevel
+//        zoomLevel: map.maximumZoomLevel
 
         Component.onCompleted: {
             for( var i_type in supportedMapTypes ) {

@@ -13,10 +13,16 @@ ACIMedia::ACIMedia(QObject *parent) : QObject(parent){
 
     m_iPreviousCurrentListIndex = -1;
 
+    m_sSongPosition="--:--";
+    m_sTitle="Nothing is playing...";
+
+    connect(this, SIGNAL(mediaChanged()), this , SLOT(loadMedia()));
+
     connect(m_oMediaModel, SIGNAL(itemClicked(Item)), this, SLOT(mediaModelClicked(Item)));
 
-    connect(m_oMusicPlayer, SIGNAL(sendProgress(int)), this, SIGNAL(sendProgress(int)));
-    connect(m_oMusicPlayer, SIGNAL(tickSongPosition(QString)), this, SIGNAL(tickSongPosition(QString)));
+    connect(m_oMusicPlayer, SIGNAL(sendProgress(int)), this, SLOT(setProgress(int)));
+    connect(m_oMusicPlayer, SIGNAL(tickSongPosition(QString)), this, SLOT(setSongPosition(QString)));
+    connect(m_oMusicPlayer, SIGNAL(sendTitle(QString)), this, SLOT(setSongTitle(QString)));
     connect(m_oMusicPlayer, SIGNAL(currentListIndexChanged(int)), this, SLOT(currentListIndexChanged(int)));
 }
 
@@ -52,10 +58,12 @@ void ACIMedia::loadMedia()
 }
 
 void ACIMedia::volup(){
+    TRACE(QString("turning volume up"));
     m_oMusicPlayer->volumeUp();
 }
 
 void ACIMedia::voldown(){
+    TRACE(QString("turning volume down"));
     m_oMusicPlayer->volumeDown();
 }
 /**

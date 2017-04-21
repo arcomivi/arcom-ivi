@@ -29,7 +29,7 @@ public:
     ~ACILogger();
 
     void setupLog();
-    void log(QString);
+    void log(QString,const int level=0);
     void setLogLevel(int v);
     void setConsoleOut(bool v);
 

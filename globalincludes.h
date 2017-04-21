@@ -27,7 +27,7 @@
 
 #include <math.h>
 
-#define TRACE_CONSOLE(lg) qDebug() << QString("[%0 %1 %2 %3 %4]- %5").arg(QDate::currentDate().toString("yy-MM-dd")).arg(QTime::currentTime().toString("hh:mm:ss:z")).arg(__FILE__).arg(__FUNCTION__).arg(__LINE__).arg(lg);
+#define TRACE_CONSOLE(lg) qDebug() << lg;
 
 #define QT_USE_FAST_CONCATENATION
 

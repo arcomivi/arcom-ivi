@@ -12,6 +12,13 @@ Rectangle {
         mediaProgress.width = mediaProgressBar.width * ( progr / 100 );
     }
 
+    Connections {
+        target: $media
+        onProgressChanged: {
+            mediaProgress.width = mediaProgressBar.width * ( value / 100 );
+        }
+    }
+
 
     Rectangle {
         id: mediaProgressBar;

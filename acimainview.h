@@ -5,16 +5,20 @@
 #include "aciusbcontroller.h"
 #include "acimedia.h"
 #include "acivideoview.h"
+#include <QMouseEvent>
+#include <QWheelEvent>
 
 class ACIMainview : public QQuickView
 {
     Q_OBJECT
 //    Q_PROPERTY(QString text READ text WRITE setText NOTIFY textChanged)
-    Q_PROPERTY(QString tick NOTIFY onTickSongPosition)
+//    Q_PROPERTY(QString tick NOTIFY onTickSongPosition)
 public:
     explicit ACIMainview(QQuickView *parent = 0);
     void setQmlFile(QString qml);
     void keyPressEvent(QKeyEvent *e);
+    void mousePressEvent(QMouseEvent *e);
+    void wheelEvent(QWheelEvent *e);
 
 Q_SIGNALS:
     void navigateToWidget(int);
@@ -27,12 +31,9 @@ public slots:
     void navigateTo(int widget);
     void handleRot(int direction);
     void updateMe();
-    void loadMedia();
-    void sendProgress(int progress);
-    void watchVideo(QString);
     void screenSelected(int);
     void exitVideo();
-    void tickSongPosition(QString tick);
+
 
 
 private:

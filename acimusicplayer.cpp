@@ -10,14 +10,15 @@ ACIMusicPlayer::ACIMusicPlayer(QObject *parent) :
 
     //second tick
     connect(m_oPlayer, SIGNAL(positionChanged(qint64)), this, SLOT(tick(qint64)));
-    connect(m_oPlayer, SIGNAL(stateChanged(QMediaPlayer::State)), this, SLOT(stateChanged(QMediaPlayer::State)));
+//    connect(m_oPlayer, SIGNAL(stateChanged(QMediaPlayer::State)), this, SLOT(stateChanged(QMediaPlayer::State)));
     connect(m_oPlayer, SIGNAL(mediaStatusChanged(QMediaPlayer::MediaStatus)), this, SLOT(metaStateChanged(QMediaPlayer::MediaStatus)));
-    connect(m_oPlayer, SIGNAL(mediaChanged(QMediaContent)), this, SLOT(mediaChanged(QMediaContent)));
-    connect(m_oPlayer, SIGNAL(error(QMediaPlayer::Error)), this, SLOT(error(QMediaPlayer::Error)));
-    connect(m_oPlayer, SIGNAL(metaDataAvailableChanged(bool)), this, SLOT(metaDataAvailableChanged(bool)));
+//    connect(m_oPlayer, SIGNAL(mediaChanged(QMediaContent)), this, SLOT(mediaChanged(QMediaContent)));
+//    connect(m_oPlayer, SIGNAL(error(QMediaPlayer::Error)), this, SLOT(error(QMediaPlayer::Error)));
+//    connect(m_oPlayer, SIGNAL(metaDataAvailableChanged(bool)), this, SLOT(metaDataAvailableChanged(bool)));
 
-    connect(m_oPlayer, SIGNAL(metaDataChanged()), this, SLOT(metaDataChanged()));
-    connect(m_oPlayer, SIGNAL(metaDataChanged(QString,QVariant)), this, SLOT(metaDataChanged(QString,QVariant)));
+
+//    connect(m_oPlayer, SIGNAL(metaDataChanged(QString,QVariant)), this, SLOT(metaDataChanged(QString,QVariant)));
+
 
     m_bPlaylistChanged=false;
     volumeStep = 10;
@@ -69,9 +70,10 @@ void ACIMusicPlayer::setPlaylistIndex(int index){
 void ACIMusicPlayer::setPlaylist(QMediaPlaylist *playlist){
     m_bPlaylistChanged=true;
     m_oPlayer->setPlaylist(playlist);
+
+
     m_oPlayer->playlist()->disconnect();
     connect(m_oPlayer->playlist(), SIGNAL(currentIndexChanged(int)), this, SLOT(currentIndexChanged(int)));
-    connect(m_oPlayer->playlist(), SIGNAL(mediaChanged(int,int)), this, SLOT(mediaChanged(int,int)));
     connect(m_oPlayer->playlist(), SIGNAL(currentMediaChanged(QMediaContent)), this, SLOT(currentMediaChanged(QMediaContent)));
 }
 
@@ -81,6 +83,9 @@ void ACIMusicPlayer::setPlaylist(QMediaPlaylist *playlist){
  */
 void ACIMusicPlayer::metaStateChanged(QMediaPlayer::MediaStatus newState){
     switch (newState) {
+    case QMediaPlayer::LoadedMedia:
+        TRACE("QMediaPlayer::LoadedMedia");
+        break;
     case QMediaPlayer::InvalidMedia:
         TRACE("QMediaPlayer::InvalidMedia");
         emit invalidMedia(m_oPlayer->errorString());
@@ -105,19 +110,21 @@ void ACIMusicPlayer::metaStateChanged(QMediaPlayer::MediaStatus newState){
             QString albumtitle = m_oPlayer->metaData(QMediaMetaData::AlbumTitle).toString();
             QString album_title = albumartist + " " + title;
             QString album_artist = albumartist + " " + albumtitle;
+
             emit sendTitle(album_title + "###" + album_artist);
+
             QString path = m_oPlayer->playlist()->currentMedia().canonicalUrl().path();
             emit sourceChanged(title, albumartist, albumtitle, path);
         } else {
             TRACE("BufferedMedia - medateda not available");
-            QString album_title = "Album Title ";
-            QString album_artist = "Album Artist";
-            emit sendTitle(album_title  + album_artist);
+            QString album_title = m_oPlayer->metaData(QMediaMetaData::AlbumTitle).toString();
+            QString album_artist = m_oPlayer->metaData(QMediaMetaData::AlbumArtist).toString();
+            emit sendTitle(album_title + QString(" - ") + album_artist);
         }
         return;
         break;
     default:
-        TRACE(newState);
+        TRACE(QString("State: ").arg(newState));
         break;
     }
 }
@@ -137,12 +144,17 @@ void ACIMusicPlayer::metaDataAvailableChanged(bool changed){
 
 void ACIMusicPlayer::metaDataChanged(){
     TRACE(QString("enter"));
-    qDebug() <<  qobject_cast<QMediaObject*>(sender())->availableMetaData();
+    QMediaObject *content = qobject_cast<QMediaObject*>(sender());
+    qDebug() << "availableMetaData: [" << content->availableMetaData()
+             << content->metaData(QMediaMetaData::AlbumArtist).toString() << "]"
+             << content->metaData(QMediaMetaData::AlbumTitle).toString()
+             << content->metaData(QMediaMetaData::Author).toString()
+             << content->metaData(QMediaMetaData::Composer).toString();
 }
 
-void ACIMusicPlayer::metaDataChanged(QString name, QVariant value){
-    TRACE(QString("enter %1, %2").arg(name).arg(value.toString()));
-}
+//void ACIMusicPlayer::metaDataChanged(QString name, QVariant value){
+//    TRACE(QString("enter %1, %2").arg(name).arg(value.toString()));
+//}
 
 /**
  * Signals that the current playing content will be obtained from media.
@@ -157,7 +169,12 @@ void ACIMusicPlayer::mediaChanged(QMediaContent source){
         QString path = source.canonicalUrl().path();
         emit sourceChanged(title, albumartist, albumtitle, path);
     }
-
+    qDebug() << "availableMetaData: [" << m_oPlayer->availableMetaData()
+             << m_oPlayer->metaData(QMediaMetaData::AlbumArtist).toString() << "]"
+             << m_oPlayer->metaData(QMediaMetaData::AlbumTitle).toString()
+             << m_oPlayer->metaData(QMediaMetaData::Author).toString()
+             << m_oPlayer->metaData(QMediaMetaData::Composer).toString()
+             << source.canonicalUrl().path();
     TRACE("exit");
 }
 
@@ -175,7 +192,6 @@ void ACIMusicPlayer::error(QMediaPlayer::Error error){
     default:
         break;
     }
-//    m_oPlayer->stop();
 }
 
 void ACIMusicPlayer::aboutToFinish(){
@@ -196,9 +212,16 @@ void ACIMusicPlayer::mediaChanged(int start, int end)
 
 void ACIMusicPlayer::currentMediaChanged(QMediaContent mediaContent){
     TRACE(QString("currentMediaChanged: %0 ").arg(mediaContent.canonicalUrl().toString()));
-    qDebug() << "available: " << m_oPlayer->availableMetaData();
-    qDebug() << m_oPlayer->metaData(QMediaMetaData::AlbumArtist).toString();
-    qDebug() << m_oPlayer->metaData(QMediaMetaData::Title).toString();
+
+    qDebug() << "Metadata available? " << m_oPlayer->isMetaDataAvailable()
+             << ", availableMetaData: [" << m_oPlayer->availableMetaData() << "]"
+             << m_oPlayer->metaData(QMediaMetaData::AlbumArtist).toString()
+             << m_oPlayer->metaData(QMediaMetaData::AlbumTitle).toString()
+             << m_oPlayer->metaData(QMediaMetaData::Author).toString()
+             << m_oPlayer->metaData(QMediaMetaData::Composer).toString();
+    QString album_title = m_oPlayer->metaData(QMediaMetaData::AlbumTitle).toString();
+    QString album_artist = m_oPlayer->metaData(QMediaMetaData::AlbumArtist).toString();
+    emit sendTitle(album_title + QString(" - ") + album_artist);
 }
 
 

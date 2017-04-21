@@ -12,14 +12,19 @@ Item {
         {
             pages[i].x = 1024;
             pages[i].visible = false;
-            pages[i].source = "";
+            //!!!do not initialize source!!!
+            //once loaded, keep in memory
+//            pages[i].source = "";
 //            console.log("jumpTo-move X to: "+pages[i].x);
         }
         pages[idx].x = 0;
         pages[idx].visible = true;
-        pages[idx].source = qmlname;
+        if(pages[idx].status === Loader.Null){
+            console.log("Loader source empty(status Null) -> set: " + qmlname)
+            pages[idx].source = qmlname;
+        }
         currentPage = pages[idx];
-        console.log("jumpTo:"+idx +", x: "+pages[idx].x +", visible:"+pages[idx].visible);
+        console.log("jumpTo: "+idx +", x: "+pages[idx].x +", visible:"+pages[idx].visible +", source: "+pages[idx].source);
     }
 
     Item {

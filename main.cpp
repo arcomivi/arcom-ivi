@@ -7,10 +7,17 @@
 #include <QLabel>
 #include <QImage>
 #include <QPixmap>
+#include <QNetworkProxy>
 
 
 int main(int argc, char *argv[]){
 
+
+    QNetworkProxy proxy;
+    proxy.setType(QNetworkProxy::HttpProxy);
+    proxy.setHostName("194.145.60.1");
+    proxy.setPort(9400);
+    QNetworkProxy::setApplicationProxy(proxy);
 
 //    qmlRegisterType<ACICamera>("ACIElements", 1, 0, "ACICamera");
 

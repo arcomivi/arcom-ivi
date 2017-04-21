@@ -11,7 +11,7 @@ ACILogger::~ACILogger(){
 /**
  * writes log into the file
  */
-void ACILogger::log(QString log){
+void ACILogger::log(QString log, int level){
 
     if(m_bConsoleOut) TRACE_CONSOLE(log);
 

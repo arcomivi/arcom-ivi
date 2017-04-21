@@ -57,7 +57,7 @@ private Q_SLOTS:
     void metaStateChanged(QMediaPlayer::MediaStatus newState);
     void metaDataAvailableChanged(bool changed);
     void metaDataChanged();
-    void metaDataChanged(QString name, QVariant value);
+//    void metaDataChanged(QString name, QVariant value);
     void aboutToFinish();
 
 

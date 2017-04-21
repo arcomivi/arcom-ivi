@@ -63,14 +63,14 @@ Item {
 
             onItemClicked: {
                 list.currentIndex = index;
-                listModel.listClicked(list.currentIndex);
+                $media.listModel.listClicked(list.currentIndex);
                 console.log("onItemClicked:"+descr);
             }
         }
 
         Component.onCompleted: {
             console.log("list.count1 = "+list.count);
-            model = listModel;
+            model = $media.listModel;
             console.log("list.count2 = "+list.count);
 
         }
