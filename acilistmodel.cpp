@@ -27,7 +27,7 @@ void ACIListModel::goUp(int index){
 }
 
 void ACIListModel::enter(int index){
-    TRACE(QString("enter: %1").arg(index));
+    TRACE(QString("index: %1").arg(index));
     emit itemClicked(m_items.at(index));
     TRACE("exit");
 }

@@ -181,63 +181,38 @@ void ACIMedia::displayAllSongs(){
     m_oMediaModel->addItem(Item("MEDIA_MUSIC","..","go_back_to_main", "left"));
 
     QString music = QDir::homePath() + "/Music";
-//    QDir musicDir(music);
-//    if(musicDir.exists()){
-//        foreach (QString entry, musicDir.entryList()) {
-//            qDebug() << entry;
-//        }
-//        foreach (QFileInfo fileInfo, musicDir.entryInfoList()) {
-//            qDebug() << fileInfo.baseName();
-//            if (fileInfo.isDir()) {
-//                QString song = music + "/" + fileInfo.baseName();
-//                foreach (QFileInfo song, QDir(song).entryInfoList()) {
-//                    if (song.isDir()) {
-//                        continue;
-//                    }
-//                    qDebug() << "song: " << song.baseName();
-//                    qDebug() << "path: " << song.absoluteFilePath();
-//                    m_oMediaModel->addItem(Item("SONG", song.baseName(), song.absoluteFilePath()));
-
-//                    //build playlist at once
-//                    QUrl url = QUrl::fromLocalFile(song.absoluteFilePath());
-//                    QMediaContent media(url);
-//                    m_songList.append(media);
-//                }
-//            }
-//        }
-//    } else {
-//        qDebug() << "does not exiswt";
-//    }
     foreach (const QStorageInfo &storage, QStorageInfo::mountedVolumes()) {
-        if (storage.isValid() && storage.isReady()) {
-            qDebug() << "Storage name: " << storage.name() << ", rootpath: " << storage.rootPath();
-            music = storage.rootPath() + "/Music";
-            QDir musicDir(music);
-            if(musicDir.exists()){
-                foreach (QString entry, musicDir.entryList()) {
-                    qDebug() << entry;
-                }
-                foreach (QFileInfo fileInfo, musicDir.entryInfoList()) {
-                    qDebug() << fileInfo.baseName();
-                    if (fileInfo.isDir()) {
-                        QString song = music + "/" + fileInfo.baseName();
-                        foreach (QFileInfo song, QDir(song).entryInfoList()) {
-                            if (song.isDir()) {
-                                continue;
-                            }
-                            qDebug() << "song: " << song.baseName();
-                            qDebug() << "path: " << song.absoluteFilePath();
-                            m_oMediaModel->addItem(Item("SONG", song.baseName(), song.absoluteFilePath()));
-
-                            //build playlist at once
-                            QUrl url = QUrl::fromLocalFile(song.absoluteFilePath());
-                            QMediaContent media(url);
-                            m_songList.append(media);
-                        }
+        if (!storage.isValid() || !storage.isReady()) {
+            TRACE(QString("!storage.isValid() || !storage.isReady()"));
+            continue;
+        }
+        qDebug() << "Storage name: " << storage.name() << ", rootpath: " << storage.rootPath();
+        music = storage.rootPath() + "/Music";
+        QDir musicDir(music);
+        if(!musicDir.exists()){
+            continue;
+        }
+        foreach (QFileInfo fileInfo, musicDir.entryInfoList()) {
+            qDebug() << fileInfo.baseName();
+            if (fileInfo.isDir()) {
+                QString songDir = music + "/" + fileInfo.baseName();
+                foreach (QFileInfo song, QDir(songDir).entryInfoList()) {
+                    if (song.isDir()) {
+                        continue;
                     }
+                    qDebug() << "song: " << song.baseName();
+                    qDebug() << "path: " << song.absoluteFilePath();
+                    m_oMediaModel->addItem(Item("SONG", song.baseName(), song.absoluteFilePath()));
+
+                    //build playlist at once
+                    QUrl url = QUrl::fromLocalFile(song.absoluteFilePath());
+                    QMediaContent media(url);
+                    m_songList.append(media);
                 }
             }
         }
+
+
     }
     if(m_iPreviousCurrentListIndex!=-1){
         m_oMediaModel->setData(m_oMediaModel->index(m_iPreviousCurrentListIndex),QVariant("black"), ACIListModel::ValueRole2);

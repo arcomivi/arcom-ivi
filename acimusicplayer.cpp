@@ -72,7 +72,7 @@ void ACIMusicPlayer::setPlaylist(QMediaPlaylist *playlist){
     m_oPlayer->setPlaylist(playlist);
 
 
-    m_oPlayer->playlist()->disconnect();
+    //m_oPlayer->playlist()->disconnect();
     connect(m_oPlayer->playlist(), SIGNAL(currentIndexChanged(int)), this, SLOT(currentIndexChanged(int)));
     connect(m_oPlayer->playlist(), SIGNAL(currentMediaChanged(QMediaContent)), this, SLOT(currentMediaChanged(QMediaContent)));
 }
@@ -253,31 +253,27 @@ void ACIMusicPlayer::playPause(int index){
     }
     //check if index == current index
     int currIndex = m_oPlayer->playlist()->currentIndex();
-    if(currIndex != index){
+    if(currIndex != index){        
         TRACE(QString("current index %0 does not equal index %1 -> stop and play").arg(currIndex).arg(index));
         m_oPlayer->stop();
         m_oPlayer->playlist()->setCurrentIndex(index);
+        for (int var = 0; var < m_oPlayer->playlist()->mediaCount(); ++var) {
+            qDebug() << m_oPlayer->playlist()->media(var).canonicalUrl();
+        }
+
         m_oPlayer->play();
+        qDebug() << "Current: " << m_oPlayer->currentMedia().canonicalUrl();
         emit tickSongPosition("00:00");
         emit sendProgress(0);
         return;
     }
-    TRACE(QString("current index %0 equals index %1 -> pause or play").arg(currIndex).arg(index));
+    TRACE(QString("current index %1 equals index %2 -> pause or play").arg(currIndex).arg(index));
     if (wasPlaying){
         TRACE("was playing -> pause");
-        //        m_oPlayer->stop();
-        //        m_oPlayer->play();
-        //        emit tickSong("00:00");
-        //        emit sendProgress(0);
         m_oPlayer->pause();
     } else if(wasPaused) {
         TRACE("was paused -> play");
-        //        m_oPlayer->stop();
-        //        m_oPlayer->play();
-        //        emit tickSong("00:00");
-        //        emit sendProgress(0);
         m_oPlayer->play();
-
     } else {
         TRACE("neither playing nor paused");
         m_oPlayer->stop();
