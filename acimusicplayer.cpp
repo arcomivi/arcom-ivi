@@ -11,7 +11,7 @@ ACIMusicPlayer::ACIMusicPlayer(QObject *parent) :
     //second tick
     connect(m_oPlayer, SIGNAL(positionChanged(qint64)), this, SLOT(tick(qint64)));
 //    connect(m_oPlayer, SIGNAL(stateChanged(QMediaPlayer::State)), this, SLOT(stateChanged(QMediaPlayer::State)));
-    connect(m_oPlayer, SIGNAL(mediaStatusChanged(QMediaPlayer::MediaStatus)), this, SLOT(metaStateChanged(QMediaPlayer::MediaStatus)));
+    connect(m_oPlayer, SIGNAL(mediaStatusChanged(QMediaPlayer::MediaStatus)), this, SLOT(mediaStatusChanged(QMediaPlayer::MediaStatus)));
 //    connect(m_oPlayer, SIGNAL(mediaChanged(QMediaContent)), this, SLOT(mediaChanged(QMediaContent)));
 //    connect(m_oPlayer, SIGNAL(error(QMediaPlayer::Error)), this, SLOT(error(QMediaPlayer::Error)));
 //    connect(m_oPlayer, SIGNAL(metaDataAvailableChanged(bool)), this, SLOT(metaDataAvailableChanged(bool)));
@@ -29,7 +29,8 @@ ACIMusicPlayer::ACIMusicPlayer(QObject *parent) :
  *
  */
 void ACIMusicPlayer::tick(qint64 time){
-    TRACE(QString("enter %1").arg(time));
+//    TRACE(QString("enter %1").arg(time));
+
     //===> get time
     QTime displayTime(0,(int) ((time / 60000) % 60), (int)((time / 1000) % 60));
     emit tickSongPosition(displayTime.toString("mm:ss"));
@@ -41,8 +42,6 @@ void ACIMusicPlayer::tick(qint64 time){
         progress = (100*time) / totalTime;
     }
     emit sendProgress(progress);
-
-//    TRACE("exit");
 }
 
 void ACIMusicPlayer::stateChanged(QMediaPlayer::State){
@@ -71,8 +70,6 @@ void ACIMusicPlayer::setPlaylist(QMediaPlaylist *playlist){
     m_bPlaylistChanged=true;
     m_oPlayer->setPlaylist(playlist);
 
-
-    //m_oPlayer->playlist()->disconnect();
     connect(m_oPlayer->playlist(), SIGNAL(currentIndexChanged(int)), this, SLOT(currentIndexChanged(int)));
     connect(m_oPlayer->playlist(), SIGNAL(currentMediaChanged(QMediaContent)), this, SLOT(currentMediaChanged(QMediaContent)));
 }
@@ -81,7 +78,7 @@ void ACIMusicPlayer::setPlaylist(QMediaPlaylist *playlist){
  *  Signals that the status of the current media has changed
  * @newState: status of media
  */
-void ACIMusicPlayer::metaStateChanged(QMediaPlayer::MediaStatus newState){
+void ACIMusicPlayer::mediaStatusChanged(QMediaPlayer::MediaStatus newState){
     switch (newState) {
     case QMediaPlayer::LoadedMedia:
         TRACE("QMediaPlayer::LoadedMedia");
@@ -119,7 +116,8 @@ void ACIMusicPlayer::metaStateChanged(QMediaPlayer::MediaStatus newState){
             TRACE("BufferedMedia - medateda not available");
             QString album_title = m_oPlayer->metaData(QMediaMetaData::AlbumTitle).toString();
             QString album_artist = m_oPlayer->metaData(QMediaMetaData::AlbumArtist).toString();
-            emit sendTitle(album_title + QString(" - ") + album_artist);
+            QString title = m_oPlayer->metaData(QMediaMetaData::Title).toString();
+            emit sendTitle(album_artist + QString(" - ") + title);
         }
         return;
         break;
@@ -221,7 +219,8 @@ void ACIMusicPlayer::currentMediaChanged(QMediaContent mediaContent){
              << m_oPlayer->metaData(QMediaMetaData::Composer).toString();
     QString album_title = m_oPlayer->metaData(QMediaMetaData::AlbumTitle).toString();
     QString album_artist = m_oPlayer->metaData(QMediaMetaData::AlbumArtist).toString();
-    emit sendTitle(album_title + QString(" - ") + album_artist);
+    QString title = m_oPlayer->metaData(QMediaMetaData::Title).toString();
+    emit sendTitle(album_artist + QString(" - ") + title);
 }
 
 

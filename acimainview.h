@@ -5,6 +5,7 @@
 #include "aciusbcontroller.h"
 #include "acimedia.h"
 #include "acivideoview.h"
+#include "acisettings.h"
 #include <QMouseEvent>
 #include <QWheelEvent>
 
@@ -33,6 +34,7 @@ public slots:
     void updateMe();
     void screenSelected(int);
     void exitVideo();
+    void loadSettings();
 
 
 
@@ -43,6 +45,7 @@ private:
     QString m_sPreviousSignal;
     ACIMedia *m_oMedia;
     ACIVideoView *m_oVideoView;    
+    ACISettings *m_oSettings;
     QObject *m_oCurrentView;
 };
 

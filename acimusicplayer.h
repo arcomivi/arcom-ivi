@@ -54,7 +54,7 @@ private Q_SLOTS:
     void tick(qint64 time);
     void mediaChanged(QMediaContent);
     void error(QMediaPlayer::Error);
-    void metaStateChanged(QMediaPlayer::MediaStatus newState);
+    void mediaStatusChanged(QMediaPlayer::MediaStatus newState);
     void metaDataAvailableChanged(bool changed);
     void metaDataChanged();
 //    void metaDataChanged(QString name, QVariant value);

@@ -36,7 +36,7 @@ Rectangle {
             height: parent.height;
             width: 0;
             color: "#B5C808";
-            Behavior on width { SmoothedAnimation { velocity: 800 } }
+            Behavior on width { SmoothedAnimation { duration: 100; velocity:1000 } }
         }
 
         MouseArea {

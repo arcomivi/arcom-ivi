@@ -50,7 +50,8 @@ SOURCES += main.cpp \
     acilistmodel.cpp \
     acimedia.cpp \
     acimusicplayer.cpp \
-    acivideoview.cpp
+    acivideoview.cpp \
+    acisettings.cpp
 
 HEADERS += \
     globalincludes.h \
@@ -63,7 +64,8 @@ HEADERS += \
     acilistmodel.h \
     acimedia.h \
     acimusicplayer.h \
-    acivideoview.h
+    acivideoview.h \
+    acisettings.h
 
 DISTFILES += \
     css/* \

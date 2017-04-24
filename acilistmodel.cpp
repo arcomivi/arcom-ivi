@@ -43,7 +43,7 @@ void ACIListModel::goDown(int index){
 void ACIListModel::listClicked(int index){
     TRACE(index);
     m_currentIndex=index;
-    enter(index);
+    emit itemClicked(m_items.at(m_currentIndex));
 }
 
 void ACIListModel::addItem(const Item &item)

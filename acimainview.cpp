@@ -14,6 +14,7 @@ ACIMainview::ACIMainview(QQuickView *parent) :
 }
 
 void ACIMainview::setQmlFile(QString qml){
+    m_oSettings=Q_NULLPTR;
     m_oMedia = new ACIMedia();
     m_oVideoView = 0;
 
@@ -26,6 +27,7 @@ void ACIMainview::setQmlFile(QString qml){
     //signals from objects:
 
     //signals from QML UI:
+    QObject::connect((QObject*)this->rootObject(), SIGNAL(loadSettings()), this , SLOT(loadSettings()));
     QObject::connect((QObject*)this->rootObject(), SIGNAL(screenSelected(int)), this , SLOT(screenSelected(int)));
     QObject::connect((QObject*)this->rootObject(), SIGNAL(update()), this , SLOT(updateMe()));
     QObject::connect((QObject*)this->rootObject(), SIGNAL(navigateTo(int)), this , SLOT(navigateTo(int)));
@@ -58,6 +60,15 @@ void ACIMainview::screenSelected(int screen){
 void ACIMainview::exitVideo(){
     m_oVideoView->destroy();
     m_oVideoView = 0;
+}
+
+void ACIMainview::loadSettings(){
+    if(m_oSettings==Q_NULLPTR){
+        m_oSettings = new ACISettings();
+        this->rootContext()->setContextProperty("$settings", m_oSettings);
+        connect(m_oSettings, SIGNAL(update()), this, SLOT(updateMe()));
+    }
+
 }
 
 void ACIMainview::keyPressEvent(QKeyEvent *e){

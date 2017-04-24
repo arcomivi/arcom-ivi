@@ -15,6 +15,7 @@ Item {
     signal zoominNavi;
     signal zoomoutNavi;
 
+    signal loadSettings
     signal loadMedia
     signal volup
     signal voldown
@@ -99,6 +100,7 @@ Item {
         }
 
         onEnterSettings: {
+            loadSettings();
             handleLeave();
             mainview.m_current = 1;
             viewsSwitcher.enterSettings();

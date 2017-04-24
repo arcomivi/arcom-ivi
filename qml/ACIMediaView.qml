@@ -64,15 +64,12 @@ Item {
             onItemClicked: {
                 list.currentIndex = index;
                 $media.listModel.listClicked(list.currentIndex);
-                console.log("onItemClicked:"+descr);
+//                console.log("onItemClicked:"+descr);
             }
         }
 
         Component.onCompleted: {
-            console.log("list.count1 = "+list.count);
             model = $media.listModel;
-            console.log("list.count2 = "+list.count);
-
         }
     }
 }
