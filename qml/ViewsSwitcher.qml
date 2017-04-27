@@ -4,7 +4,8 @@ Item {
     id: viewsSwitcherContainer
 
     property alias pages: viewsSwitcherItem.children
-    property Item currentPage
+//    property Item currentPage
+    property alias itemObject: viewsSwitcherItem
 
     function jumpTo(idx, qmlname){
         console.log("jumpTo: "+idx);
@@ -23,8 +24,9 @@ Item {
             console.log("Loader source empty(status Null) -> set: " + qmlname)
             pages[idx].source = qmlname;
         }
-        currentPage = pages[idx];
+//        currentPage = pages[idx];
         console.log("jumpTo: "+idx +", x: "+pages[idx].x +", visible:"+pages[idx].visible +", source: "+pages[idx].source);
+
     }
 
     Item {

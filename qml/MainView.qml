@@ -157,10 +157,12 @@ Item {
         }
 
         function goToView(view, qmlname){
+            var cmp = Qt.createComponent(qmlname);
+            cmp.createObject(viewsSwitcher.itemObject, {})
             m_viewsSwitcher_current = view;
             //console.log("viewsSwitcher-goToView: " + view +" ("+m_current+")");
             //console.log(pages[view]);
-            jumpTo(view, qmlname);
+            //jumpTo(view, qmlname);
         }
 
         function handleRot(direction){

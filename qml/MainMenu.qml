@@ -95,7 +95,9 @@ Item {
     }
 
 
-
+//    GridView {
+//        id: mainMenuGrid;
+//    }
     Row {
         id: mainMenuRow;
         width: parent.width; height: parent.height;

@@ -3,6 +3,7 @@ import QtQuick 2.5
 Item {
     id: viewHome;
     visible: true;
+    anchors.fill: parent;
     Rectangle { color: "#636363"; anchors.fill: parent;
         Text {
             id: viewHomeText;
