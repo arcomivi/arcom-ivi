@@ -13,13 +13,22 @@ ACIMainview::ACIMainview(QQuickView *parent) :
     m_bCtrlFirstRun=true;
 }
 
-void ACIMainview::setQmlFile(QString qml){
+void ACIMainview::setQmlFile(QString qml) {
+//TODO: Serial Port testing
+//    qDebug() << "Serial ports available: ";
+//    foreach (QSerialPortInfo info, QSerialPortInfo::availablePorts()) {
+//        qDebug() << info.portName();
+//    }
+    m_oMainViewModel = new ACIMainViewModel();
+    m_oPageNavigation = new ACIPageNavigation();
     m_oSettings=Q_NULLPTR;
     m_oMedia = new ACIMedia();
     m_oVideoView = 0;
 
     //context properties must be loaded before loading the QML, if possible ;-)
     this->rootContext()->setContextProperty("$media", m_oMedia);
+    this->rootContext()->setContextProperty("$pageNavigation", m_oPageNavigation);
+    this->rootContext()->setContextProperty("$mainViewModel", m_oMainViewModel);
     this->setSource(QUrl(qml));
 
     m_oCurrentView = (QObject*)this->rootObject();
@@ -101,7 +110,8 @@ void ACIMainview::keyPressEvent(QKeyEvent *e){
         return;
     }
     if(e->key() == Qt::Key_R){ //release PUSHB
-        QMetaObject::invokeMethod((QObject*)this->rootObject(), "handleRelease", Qt::DirectConnection);
+        //QMetaObject::invokeMethod((QObject*)this->rootObject(), "handleRelease", Qt::DirectConnection);
+        emit m_oPageNavigation->handleRelease();
         return;
     }
     if(e->key() == Qt::Key_M){ //ROT1
@@ -220,15 +230,15 @@ void ACIMainview::onBroadcastCtrlEvent(QString event){
 
 
     //now do the comparison
-//    TRACE("volume push");
+    //    TRACE("volume push");
     if(m_sCtrl.vol_push == 1 && m_sCtrlPrev.vol_push == 0){
         m_sCtrlPrev.vol_push = m_sCtrl.vol_push;
-//        QMetaObject::invokeMethod(m_wMedia, "handleVolPush", Qt::DirectConnection);
+        //        QMetaObject::invokeMethod(m_wMedia, "handleVolPush", Qt::DirectConnection);
         return;
     }
     m_sCtrlPrev.vol_push = m_sCtrl.vol_push;
 
-//    TRACE("push");
+    //    TRACE("push");
     //push is pressed and last was not pressed
     if(m_sCtrl.push == 1 && m_sCtrlPrev.push == 0){
         m_sCtrlPrev.push = m_sCtrl.push;
@@ -245,7 +255,7 @@ void ACIMainview::onBroadcastCtrlEvent(QString event){
     //if not push or release, assign the last value
     m_sCtrlPrev.push = m_sCtrl.push;
 
-//    TRACE(QString("rotation: %1%2 -> %3%4").arg(m_sCtrlPrev.rot1).arg(m_sCtrlPrev.rot2).arg(m_sCtrl.rot1).arg(m_sCtrl.rot2));
+    //    TRACE(QString("rotation: %1%2 -> %3%4").arg(m_sCtrlPrev.rot1).arg(m_sCtrlPrev.rot2).arg(m_sCtrl.rot1).arg(m_sCtrl.rot2));
     //===>rotation clockwise
     //00 -> 10, 10->11, 11->01, 01->00
     if((m_sCtrlPrev.rot1 == 0 && m_sCtrlPrev.rot2 == 0 &&
@@ -299,14 +309,14 @@ void ACIMainview::onBroadcastCtrlEvent(QString event){
     //left
     if(m_sCtrl.dir_left == 1 && m_sCtrlPrev.dir_left==0){
         m_sCtrlPrev.dir_left = m_sCtrl.dir_left;
-//        QMetaObject::invokeMethod(m_wCurrentWidget, "handleDirLeft", Qt::DirectConnection);
+        //        QMetaObject::invokeMethod(m_wCurrentWidget, "handleDirLeft", Qt::DirectConnection);
         return;
     }
     m_sCtrlPrev.dir_left = m_sCtrl.dir_left;
     //right
     if(m_sCtrl.dir_right == 1 && m_sCtrlPrev.dir_right==0){
         m_sCtrlPrev.dir_right = m_sCtrl.dir_right;
-//        QMetaObject::invokeMethod(m_wCurrentWidget, "handleDirRight", Qt::DirectConnection);
+        //        QMetaObject::invokeMethod(m_wCurrentWidget, "handleDirRight", Qt::DirectConnection);
         return;
     }
     m_sCtrlPrev.dir_right = m_sCtrl.dir_right;
@@ -347,10 +357,18 @@ void ACIMainview::onBroadcastCtrlEvent(QString event){
     }
 }
 
+
+//!
+//! \brief ACIMainview::enterNavigation
+//!
 void ACIMainview::enterNavigation(){
     emit navigateToWidget(ViewNavigation);
 }
 
+//!
+//! \brief ACIMainview::navigateTo
+//! \param widget
+//!
 void ACIMainview::navigateTo(int widget){
     TRACE(widget);
     QProcess xwininfo;
@@ -373,20 +391,21 @@ void ACIMainview::navigateTo(int widget){
 
     QMainWindow *navWindow = new QMainWindow();
 
-//    qDebug() << window->windowFlags();
+    //    qDebug() << window->windowFlags();
     navWindow->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);// | Qt::BypassWindowManagerHint);
     navWindow->move(0,75);
     navWindow->setFixedSize(
-            QGuiApplication::screens().at(0)->availableGeometry().width(),
-            350);
+                QGuiApplication::screens().at(0)->availableGeometry().width(),
+                350);
     navWindow->setCentralWidget(navWidget);
     navWindow->show();
 }
 
 
-/** ===============================
- *  handleRot(int direction) - rotation handler
- */
+//!
+//! \brief ACIMainview::handleRot
+//! \param direction
+//!
 void ACIMainview::handleRot(int direction) {
     if(direction==0){
         QMetaObject::invokeMethod((QObject*)rootObject(), "rotateCW");
@@ -396,14 +415,18 @@ void ACIMainview::handleRot(int direction) {
 }
 
 #include <QStorageInfo>
+
+//!
+//! \brief ACIMainview::updateMe
+//!
 void ACIMainview::updateMe(){
-//    //TODO: move to separate helper class
+    //    //TODO: move to separate helper class
     TRACE("updating1...");
 
-//    QString update_dir="not-found";
+    //    QString update_dir="not-found";
     TRACE("updating2...");
-//#ifdef Q_OS_LINUX
-//    QList<QStorageInfo> logicalDrives = QStorageInfo::mountedVolumes();
+    //#ifdef Q_OS_LINUX
+    //    QList<QStorageInfo> logicalDrives = QStorageInfo::mountedVolumes();
     TRACE("updating3...");
     QString update_dir="";
     foreach (const QStorageInfo &storage, QStorageInfo::mountedVolumes()) {
@@ -418,12 +441,12 @@ void ACIMainview::updateMe(){
             }
         }
 
-//    foreach(QString drive, logicalDrives){
-//        if(drive=="/"){
-//            update_dir = drive + "update";
-//        } else {
-//            update_dir = drive + "/update";
-//        }
+        //    foreach(QString drive, logicalDrives){
+        //        if(drive=="/"){
+        //            update_dir = drive + "update";
+        //        } else {
+        //            update_dir = drive + "/update";
+        //        }
         TRACE(QString("usb: %1").arg(update_dir));
         QDir dir(update_dir);
         if(dir.exists()){
@@ -443,13 +466,13 @@ void ACIMainview::updateMe(){
     //check if equals to: not-found
     if(update_dir.compare("not-found", Qt::CaseInsensitive)==0){
         TRACE("no updates found");
-////        emit displayNotification("No update folder found!");
+        ////        emit displayNotification("No update folder found!");
 
         return;
     }
 
 
-//    //0. do some checks
+    //    //0. do some checks
     if(update_dir==""){
         TRACE("update_dir empty");
         return;
@@ -459,7 +482,54 @@ void ACIMainview::updateMe(){
     system(updateScript.toLatin1().data());
     TRACE("end "+updateScript);
     QGuiApplication::quit();
-//#endif
-////    emit displayNotification(QString("... update done!"));
+    //#endif
+    ////    emit displayNotification(QString("... update done!"));
     TRACE("exit");
+}
+
+
+//!
+//! \brief ACIMainViewModel::ACIMainViewModel
+//! \param parent
+//!
+ACIMainViewModel::ACIMainViewModel(QObject *parent) : QObject(parent) {
+    m_mainMenu = new ACIListModel();
+    m_mainMenu->addItem(Item("media", ""));
+    m_mainMenu->addItem(Item("navi", ""));
+    m_mainMenu->addItem(Item("sync", ""));
+    m_mainMenu->addItem(Item("options", ""));
+}
+
+//!
+//! \brief ACIMainViewModel::~ACIMainViewModel
+//!
+ACIMainViewModel::~ACIMainViewModel() {
+
+}
+
+//!
+//! \brief ACIPageNavigation::ACIPageNavigation
+//! \param parent
+//!
+ACIPageNavigation::ACIPageNavigation(QObject *parent) : QObject(parent) {
+
+}
+
+//!
+//! \brief ACIPageNavigation::~ACIPageNavigation
+//!
+ACIPageNavigation::~ACIPageNavigation() {
+
+}
+
+
+
+//!
+//! \brief ACIPageNavigation::init
+//!
+void ACIPageNavigation::init()
+{
+    TRACE("init page navigation...");
+    m_current=0;
+    emit loadView("ACIHomeView.qml");
 }

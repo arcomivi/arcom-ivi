@@ -34,6 +34,20 @@ Item {
         }
     }
 
+    Connections {
+        target: $pageNavigation
+        onLoadView: {
+            console.log("LoadView: "+aView);
+            viewsSwitcher.goToView(0, aView);
+            mainview.children[$pageNavigation.current].handleEnter();
+        }
+
+        onHandleRelease: {
+            console.log("pageNavigation::handleRelease()")
+            mainview.children[$pageNavigation.current].handleRelease();
+        }
+    }
+
     function chooseScreen(){
 
     }
@@ -59,7 +73,7 @@ Item {
     }
 
     function handleRelease() {
-        mainview.children[m_current].handleRelease();
+//        mainview.children[m_current].handleRelease();
     }
 
     function handleDirUp(){
@@ -72,20 +86,25 @@ Item {
 
     Component.onCompleted: {
         console.log(Qt.platform.os);
-        if(m_current===-1) { m_current = 0; }
-        mainview.children[m_current].handleEnter();
-        viewsSwitcher.goToView(0, "ACIHomeView.qml");
+        $pageNavigation.init();
+//        if(m_current===-1) { m_current = 0; }
+//        mainview.children[m_current].handleEnter();
+//        viewsSwitcher.goToView(0, "ACIHomeView.qml");
     }
 
     // ==> UI elements
     // ===> Main Menu (m_current === 0)
     MainMenu {
         id: mainMenu;
+        objectName: "mainMenu"
         width: parent.width;
         height: Math.floor(parent.height*0.1);
         anchors.top: mainview.top;
 
-        function handleDirUp(){}
+        aGridModel: $mainViewModel.listModel
+
+        function handleDirUp(){
+        }
         function handleDirDown(){
             console.log("mainMenu.handleDirDown");
             handleLeave();
@@ -199,7 +218,7 @@ Item {
                 console.log("go up");
                 mainview.m_current = 0;
                 mainview.children[m_current].handleEnter();
-            }            
+            }
         }
         Connections {
             target: settingsViewLoader.item;

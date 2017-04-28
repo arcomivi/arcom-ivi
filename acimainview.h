@@ -6,14 +6,53 @@
 #include "acimedia.h"
 #include "acivideoview.h"
 #include "acisettings.h"
+#include "acilistmodel.h"
 #include <QMouseEvent>
 #include <QWheelEvent>
+
+class ACIPageNavigation : public QObject
+{
+    Q_OBJECT
+    Q_PROPERTY(int current READ current WRITE setCurrent NOTIFY currentChanged)
+public:
+    ACIPageNavigation(QObject *parent=0);
+    virtual ~ACIPageNavigation();
+    int current() {return m_current;}
+
+//    void handleRelease();
+
+signals:
+    void loadView(QString aView);
+    void currentChanged();
+    void handleRelease();
+
+public slots:
+    void init();
+    void setCurrent(int value) { m_current = value; }
+private:
+    int m_current;
+};
+
+class ACIMainViewModel : public QObject
+{
+    Q_OBJECT
+    Q_PROPERTY(QObject* listModel READ getModel NOTIFY listModelChanged)
+public:
+    ACIMainViewModel(QObject *parent=0);
+    virtual ~ACIMainViewModel();
+
+    ACIListModel* getModel(){ return m_mainMenu; }
+
+signals:
+    void listModelChanged(QObject* aNewModel);
+private:
+    ACIListModel *m_mainMenu;
+};
+
 
 class ACIMainview : public QQuickView
 {
     Q_OBJECT
-//    Q_PROPERTY(QString text READ text WRITE setText NOTIFY textChanged)
-//    Q_PROPERTY(QString tick NOTIFY onTickSongPosition)
 public:
     explicit ACIMainview(QQuickView *parent = 0);
     void setQmlFile(QString qml);
@@ -47,6 +86,8 @@ private:
     ACIVideoView *m_oVideoView;    
     ACISettings *m_oSettings;
     QObject *m_oCurrentView;
+    ACIPageNavigation *m_oPageNavigation;
+    ACIMainViewModel *m_oMainViewModel;
 };
 
 #endif // ACIMAINVIEW_H
