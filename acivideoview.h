@@ -5,6 +5,7 @@
 #include "aciconfig.h"
 #include "aciusbcontroller.h"
 
+
 class ACIVideoView : public QQuickView
 {
     Q_OBJECT

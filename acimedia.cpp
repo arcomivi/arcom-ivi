@@ -66,6 +66,11 @@ void ACIMedia::voldown(){
     TRACE(QString("turning volume down"));
     m_oMusicPlayer->volumeDown();
 }
+
+void ACIMedia::play(){
+    TRACE(QString("play/pause"));
+    m_oMediaModel->listClicked(m_oMediaModel->getCurrentIndex());
+}
 /**
  * @brief ACIMedia::currentListIndexChanged
  * @param listIndex
@@ -192,11 +197,11 @@ void ACIMedia::displayAllSongs(){
         if(!musicDir.exists()){
             continue;
         }
-        foreach (QFileInfo fileInfo, musicDir.entryInfoList()) {
-            qDebug() << fileInfo.baseName();
+        foreach (QFileInfo fileInfo, musicDir.entryInfoList(QDir::NoDotAndDotDot|QDir::AllEntries)) {
+            qDebug() << "absoluteFilePath(): " << fileInfo.absoluteFilePath();
             if (fileInfo.isDir()) {
                 QString songDir = music + "/" + fileInfo.baseName();
-                foreach (QFileInfo song, QDir(songDir).entryInfoList()) {
+                foreach (QFileInfo song, QDir(songDir).entryInfoList(QDir::NoDotAndDotDot|QDir::AllEntries)) {
                     if (song.isDir()) {
                         continue;
                     }
@@ -209,6 +214,11 @@ void ACIMedia::displayAllSongs(){
                     QMediaContent media(url);
                     m_songList.append(media);
                 }
+            } else {
+                m_oMediaModel->addItem(Item("SONG", fileInfo.baseName(), fileInfo.absoluteFilePath()));
+                QUrl url = QUrl::fromLocalFile(fileInfo.absoluteFilePath());
+                QMediaContent media(url);
+                m_songList.append(media);
             }
         }
 

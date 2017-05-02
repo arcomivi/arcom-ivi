@@ -2,26 +2,21 @@
 
 Item {
     id: rootMainMenu
-    objectName: "rootMainMenu"
 
     // ==> properties
-    property int noOfElements: 4
-    property string btnPrefix: "internet-bt-"
+    property alias aGridModel: mainMenuGrid.model
     property int m_current: -1
 
     // ==> signals
-    signal enterMedia
-    signal enterNavigation
-    signal enterSync
-    signal enterSettings
+    //...
 
-    function setCssPrefix(prefix){
-        g_cssprefix = prefix;
-    }
-
+    // ==> functions
     function handleLeave() {
         if(m_current===-1) { m_current = 0; }
         mainMenuRow.children[m_current].setButtonInactive();
+    }
+
+    function handleDirUp(){
     }
 
     function handleEnter() {
@@ -30,24 +25,7 @@ Item {
     }
 
     function handleRelease(){
-        switch(m_current){
-        case 0:
-            mainMenuRow.children[m_current].setButtonReleased();
-            rootMainMenu.enterMedia();
-            break;
-        case 1:
-            mainMenuRow.children[m_current].setButtonReleased();
-            rootMainMenu.enterNavigation();
-            break;
-        case 2:
-            mainMenuRow.children[m_current].setButtonReleased();
-            rootMainMenu.enterSync();
-            break;
-        case 3:
-            mainMenuRow.children[m_current].setButtonReleased();
-            rootMainMenu.enterSettings();
-            break;
-        }
+        aGridModel.listClicked(mainMenuGrid.currentIndex);
     }
 
     function handlePush(){
@@ -69,7 +47,7 @@ Item {
 
     function handleRot(direction){
         if(m_current===-1) { m_current = 0; }
-        console.log("rootMainMenu-handleRot"+ direction);
+
         if(direction===0){
             handleRotCw();
         } else {
@@ -78,23 +56,20 @@ Item {
     }
 
     function handleRotCw(){
-        console.log("handleRotCw");
-        mainMenuRow.children[m_current].setButtonInactive();
-        m_current++;
-        if(m_current >= noOfElements) m_current = noOfElements - 1;
-        console.log("handleRotCw"+m_current);
-        mainMenuRow.children[m_current].setButtonActive();
+        if((mainMenuGrid.currentIndex + 1) < mainMenuGrid.count){
+            mainMenuGrid.currentIndex = mainMenuGrid.currentIndex + 1;
+        }
+        mainMenuGrid.positionViewAtIndex(mainMenuGrid.currentIndex, GridView.Visible);
     }
 
     function handleRotCcw(){
-        mainMenuRow.children[m_current].setButtonInactive();
-        m_current--;
-        if(m_current < 0) m_current = 0;
-        console.log("handleRotCcw"+m_current);
-        mainMenuRow.children[m_current].setButtonActive();
+        if((mainMenuGrid.currentIndex-1)  >=0){
+            mainMenuGrid.currentIndex = mainMenuGrid.currentIndex-1;
+        }
+        mainMenuGrid.positionViewAtIndex(mainMenuGrid.currentIndex, GridView.Visible);
     }
 
-    property alias aGridModel: mainMenuGrid.model
+
 
     GridView {
         id: mainMenuGrid;
@@ -106,10 +81,13 @@ Item {
             width: mainMenuGrid.cellWidth
             pngname: name
             text: ""
+            borderWidth.width: GridView.isCurrentItem ? 1:0;
             btnImg: g_cssprefix + "css/mainmenu/active/"+ pngname +"013.png"
             btnImgPressed: g_cssprefix + "css/mainmenu/inactive/"+pngname+".png"
+
             onClicked: {
-                console.log("MainMenu button clicked!"+rootMainMenu.width+mainMenuGrid.cellWidth)
+                mainMenuGrid.currentIndex = index;
+                aGridModel.listClicked(mainMenuGrid.currentIndex);
             }
         }
     }

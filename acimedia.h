@@ -48,6 +48,7 @@ public slots:
     void mediaModelClicked(Item itemClicked);
     void volup();
     void voldown();
+    void play();
 
     void currentListIndexChanged(int listIndex);
 

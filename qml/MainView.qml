@@ -16,9 +16,7 @@ Item {
     signal zoomoutNavi;
 
     signal loadSettings
-    signal loadMedia
-    signal volup
-    signal voldown
+    signal loadMedia    
     signal screenSelected(int screen)
 
 
@@ -28,7 +26,7 @@ Item {
         target: $media
         onWatchVideo:{
             console.log("chooseScreen..........................");
-            m_current = 5;
+            $pageNavigation.current=5;
             genericLoader.source = "";
             genericLoader.source = "ACISelectScreen.qml";
         }
@@ -41,10 +39,26 @@ Item {
             viewsSwitcher.goToView(0, aView);
             mainview.children[$pageNavigation.current].handleEnter();
         }
+        onLoadSteering: {
+            console.log("LoadSteering: "+aSteering);
+            viewSteerings.goToSteering(aSteering)
+        }
 
         onHandleRelease: {
-            console.log("pageNavigation::handleRelease()")
+            //console.log("pageNavigation::handleRelease()")
             mainview.children[$pageNavigation.current].handleRelease();
+        }
+
+        onHandleRot: {
+            mainview.children[$pageNavigation.current].handleRot(direction);
+        }
+
+        onHandleDirUp: {
+            mainview.children[$pageNavigation.current].handleDirUp();
+        }
+
+        onHandleDirDown: {
+            mainview.children[$pageNavigation.current].handleDirDown();
         }
     }
 
@@ -57,31 +71,6 @@ Item {
         m_current = 4;
         videoLoader.source = "ACIVideoView.qml";
         videoLoader.item.setVideoSource(name);
-    }
-
-    function sendProgress(progress){
-        viewSteerings.setMusicProgress(progress);
-    }
-
-    function handleRot(direction){
-        if(m_current===-1) { m_current = 0; }
-        mainview.children[m_current].handleRot(direction);
-    }
-
-    function handlePush(){
-        mainview.children[m_current].handlePush();
-    }
-
-    function handleRelease() {
-//        mainview.children[m_current].handleRelease();
-    }
-
-    function handleDirUp(){
-        mainview.children[m_current].handleDirUp();
-    }
-
-    function handleDirDown(){
-        mainview.children[m_current].handleDirDown();
     }
 
     Component.onCompleted: {
@@ -103,31 +92,12 @@ Item {
 
         aGridModel: $mainViewModel.listModel
 
-        function handleDirUp(){
-        }
+
         function handleDirDown(){
             console.log("mainMenu.handleDirDown");
             handleLeave();
             mainview.m_current = 1;
             viewsSwitcher.handleEnter();
-        }
-
-        onEnterMedia: {
-            handleLeave();
-            mainview.m_current = 1;
-            viewsSwitcher.enterMedia();
-        }
-
-        onEnterSettings: {
-            loadSettings();
-            handleLeave();
-            mainview.m_current = 1;
-            viewsSwitcher.enterSettings();
-        }
-        onEnterNavigation: {
-            handleLeave();
-            mainview.m_current = 1;
-            viewsSwitcher.enterNavigation();
         }
     }
 
@@ -136,61 +106,27 @@ Item {
         id: viewsSwitcher
         width: parent.width;
         height: Math.floor(parent.height*0.7);
-        anchors.top: mainMenu.bottom;
-
-        property int m_viewsSwitcher_current: -1;
+        anchors.top: mainMenu.bottom;        
 
         function handleDirUp(){
             handleLeave();
-            mainview.m_current = 0;
+            $pageNavigation.current=0;
             mainMenu.handleEnter();
         }
 
         function handleDirDown(){
             handleLeave();
-            mainview.m_current = 2;
-            viewSteerings.handleEnter();
-        }
-
-        function enterNavigation(){
-            viewsSwitcher.goToView(3, "ACINaviView.qml");
-            viewSteerings.goToSteering(1);
-        }
-
-        function enterMedia(){
-            $media.loadMedia();
-            viewsSwitcher.goToView(1, "ACIMediaView.qml");
-            viewSteerings.goToSteering(0);
-        }
-        function enterSettings(){
-            viewsSwitcher.goToView(2, "ACISettingsView.qml");
-            viewSteerings.goToSteering(1);
-        }
-
-        function handleEnter(){
-            //console.log("viewsSwitcher.handleEnter");
-        }
-
-        function handleLeave(){
-
+            $pageNavigation.current=2;
+            viewSteerings.goToSteering(0)
         }
 
         function goToView(view, qmlname){
-            var cmp = Qt.createComponent(qmlname);
-            cmp.createObject(viewsSwitcher.itemObject, {})
-            m_viewsSwitcher_current = view;
-            //console.log("viewsSwitcher-goToView: " + view +" ("+m_current+")");
-            //console.log(pages[view]);
-            //jumpTo(view, qmlname);
-        }
-
-        function handleRot(direction){
-            //console.log("ViewsSwitcher.handleRot"+ direction);
-            pages[m_viewsSwitcher_current].item.handleRot(direction);
-        }
-
-        function handleRelease() {
-            pages[m_viewsSwitcher_current].item.handleRelease();
+            if(viewsSwitcher.exists(qmlname)===false){
+//                console.log("creating: "+qmlname);
+                var cmp = Qt.createComponent(qmlname);
+                cmp.createObject(viewsSwitcher.itemObject, {})
+            }
+            jumpTo(view, qmlname);
         }
 
         pages: [
@@ -212,18 +148,18 @@ Item {
             //3
             Loader { id: naviViewLoader; anchors.fill: parent; }
         ]
+
         Connections {
             target: mediaViewLoader.item;
             onGoUp: {
-                console.log("go up");
                 mainview.m_current = 0;
                 mainview.children[m_current].handleEnter();
             }
         }
+
         Connections {
             target: settingsViewLoader.item;
             onGoUp: {
-                console.log("go up");
                 mainview.m_current = 0;
                 mainview.children[m_current].handleEnter();
             }
@@ -241,13 +177,7 @@ Item {
         anchors {
             bottom: statusBar.top;
         }
-
-        onVolup: $media.volup();
-        onVoldown: $media.voldown();
-        onPrevMusic: mediaViewLoader.item.handlePrevious();
-        onPlaypauseMusic: mediaViewLoader.item.handleRelease();
-        onNextMusic: mediaViewLoader.item.handleNext();
-        onBackToPrevious: { mainview.m_current = 1; }
+        onBackToPrevious: { $pageNavigation.current=1; }
     }
 
     //status bar
@@ -282,7 +212,7 @@ Item {
             console.log("onScreenSelected: "+screen);
             mainview.screenSelected(screen);
             genericLoader.source = "";
-            m_current = 1;
+            $pageNavigation.current=1;
         }
     }
 }

@@ -21,22 +21,30 @@ void ACIMainview::setQmlFile(QString qml) {
 //    }
     m_oMainViewModel = new ACIMainViewModel();
     m_oPageNavigation = new ACIPageNavigation();
+    m_oMainViewModel->setPageNavigation(m_oPageNavigation);
     m_oSettings=Q_NULLPTR;
     m_oMedia = new ACIMedia();
+    m_oSteerings = new ACISteerings();
     m_oVideoView = 0;
 
     //context properties must be loaded before loading the QML, if possible ;-)
     this->rootContext()->setContextProperty("$media", m_oMedia);
     this->rootContext()->setContextProperty("$pageNavigation", m_oPageNavigation);
     this->rootContext()->setContextProperty("$mainViewModel", m_oMainViewModel);
+    this->rootContext()->setContextProperty("$steerings", m_oSteerings);
     this->setSource(QUrl(qml));
 
     m_oCurrentView = (QObject*)this->rootObject();
 
     //signals from objects:
+    connect(m_oMainViewModel, SIGNAL(loadMedia()), m_oMedia, SLOT(loadMedia()));
+    connect(m_oMainViewModel, SIGNAL(loadSettings()), this , SLOT(loadSettings()));
 
+    connect(m_oSteerings, SIGNAL(play()), m_oMedia, SLOT(play()));
+    connect(m_oSteerings, SIGNAL(volup()), m_oMedia, SLOT(volup()));
+    connect(m_oSteerings, SIGNAL(voldown()), m_oMedia, SLOT(voldown()));
     //signals from QML UI:
-    QObject::connect((QObject*)this->rootObject(), SIGNAL(loadSettings()), this , SLOT(loadSettings()));
+
     QObject::connect((QObject*)this->rootObject(), SIGNAL(screenSelected(int)), this , SLOT(screenSelected(int)));
     QObject::connect((QObject*)this->rootObject(), SIGNAL(update()), this , SLOT(updateMe()));
     QObject::connect((QObject*)this->rootObject(), SIGNAL(navigateTo(int)), this , SLOT(navigateTo(int)));
@@ -45,9 +53,14 @@ void ACIMainview::setQmlFile(QString qml) {
     QTimer::singleShot(500, ACIUsbController::getInstance(), SLOT(connectCtrlSignal()));
 }
 
+//!
+//! \brief ACIMainview::screenSelected
+//! \param screen
+//!
 void ACIMainview::screenSelected(int screen){
     if(!m_oVideoView){
         m_oVideoView = new ACIVideoView();
+        m_oVideoView->rootContext()->setContextProperty("$steerings", m_oSteerings);
         m_oVideoView->setQmlFile(ACIConfig::instance()->getQmlPrefix()+"ACIVideoView.qml");
         m_oVideoView->setFlags(Qt::FramelessWindowHint);
         m_oVideoView->setResizeMode(QQuickView::SizeRootObjectToView);
@@ -65,12 +78,20 @@ void ACIMainview::screenSelected(int screen){
     m_oVideoView->setScreen(qApp->screens()[screen]);
 }
 
-
+//!
+//! \brief ACIMainview::exitVideo
+//!
 void ACIMainview::exitVideo(){
+    //TODO: investivate hide/show/focus
+//    m_oVideoView->hide();
+//    this->show();
     m_oVideoView->destroy();
     m_oVideoView = 0;
 }
 
+//!
+//! \brief ACIMainview::loadSettings
+//!
 void ACIMainview::loadSettings(){
     if(m_oSettings==Q_NULLPTR){
         m_oSettings = new ACISettings();
@@ -90,11 +111,13 @@ void ACIMainview::keyPressEvent(QKeyEvent *e){
     //    }
 
     if(e->key() == Qt::Key_W){ //UP
-        QMetaObject::invokeMethod((QObject*)this->rootObject(), "handleDirUp", Qt::DirectConnection);
+//        QMetaObject::invokeMethod((QObject*)this->rootObject(), "handleDirUp", Qt::DirectConnection);
+        emit m_oPageNavigation->handleDirUp();
         return;
     }
     if(e->key() == Qt::Key_Z){ //DOWN
         QMetaObject::invokeMethod((QObject*)this->rootObject(), "handleDirDown", Qt::DirectConnection);
+        emit m_oPageNavigation->handleDirDown();
         return;
     }
     if(e->key() == Qt::Key_A){ //LEFT
@@ -115,11 +138,13 @@ void ACIMainview::keyPressEvent(QKeyEvent *e){
         return;
     }
     if(e->key() == Qt::Key_M){ //ROT1
-        QMetaObject::invokeMethod(m_oCurrentView, "handleRot", Qt::DirectConnection, Q_ARG(QVariant, 0));
+        //QMetaObject::invokeMethod(m_oCurrentView, "handleRot", Qt::DirectConnection, Q_ARG(QVariant, 0));
+        emit m_oPageNavigation->handleRot(0);
         return;
     }
     if(e->key() == Qt::Key_N){ //ROT2
-        QMetaObject::invokeMethod(m_oCurrentView, "handleRot", Qt::DirectConnection, Q_ARG(QVariant, 1));
+        //QMetaObject::invokeMethod(m_oCurrentView, "handleRot", Qt::DirectConnection, Q_ARG(QVariant, 1));
+        emit m_oPageNavigation->handleRot(1);
         return;
     }
 
@@ -498,6 +523,7 @@ ACIMainViewModel::ACIMainViewModel(QObject *parent) : QObject(parent) {
     m_mainMenu->addItem(Item("navi", ""));
     m_mainMenu->addItem(Item("sync", ""));
     m_mainMenu->addItem(Item("options", ""));
+    connect(m_mainMenu, SIGNAL(itemClicked(Item)), this, SLOT(listModelClicked(Item)));
 }
 
 //!
@@ -505,6 +531,30 @@ ACIMainViewModel::ACIMainViewModel(QObject *parent) : QObject(parent) {
 //!
 ACIMainViewModel::~ACIMainViewModel() {
 
+}
+
+//!
+//! \brief ACIMainViewModel::listModelClicked
+//! \param itemClicked
+//!
+void ACIMainViewModel::listModelClicked(Item itemClicked){
+    TRACE(QString("Name: %1, Descr: %2, Value: %3")
+          .arg(itemClicked.name())
+          .arg(itemClicked.descr())
+          .arg(itemClicked.value()));
+
+    QString name = itemClicked.name();
+
+    if(name.compare("media")==0){
+        emit loadMedia();
+        m_pageNavigation->setCurrent(1);
+        emit m_pageNavigation->loadView("ACIMediaView.qml");
+        emit m_pageNavigation->loadSteering("0");
+    } else if(name.compare("options")==0){
+        emit loadSettings();
+        m_pageNavigation->setCurrent(1);
+        emit m_pageNavigation->loadView("ACISettingsView.qml");
+    }
 }
 
 //!

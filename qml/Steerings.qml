@@ -91,7 +91,6 @@ Rectangle {
     }
 
     function handleEnter(){
-        //console.log("steerings.handleEnter");
         currentSteering.handleEnter();
     }
 
@@ -126,6 +125,7 @@ Rectangle {
         }
         steerSwitcher.jumpTo(category);
         currentSteering = steerSwitcher.pages[category];
+        handleEnter();
     }
 
     function setVideoProgress(progr){
@@ -159,18 +159,13 @@ Rectangle {
             //0
             SteerMusic {
                 id: steerMusic;
-                onGoRight: { steerSwitched(4); }
+                aGridModel: $steerings.steerMusicModel
 
-                onVolup: steerings.volup();
-                onVoldown: steerings.voldown();
-                onPrev: steerings.prevMusic();
-                onPlaypause: steerings.playpauseMusic();
-                onNext: steerings.nextMusic();
                 onSeek: steerings.seekMusic(percentage);
                 onGoUp: {
                     handleLeave();
                     steerings.backToPrevious();
-                }
+                }                
             },
 
 //            //1

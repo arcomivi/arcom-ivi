@@ -7,6 +7,7 @@
 #include "acivideoview.h"
 #include "acisettings.h"
 #include "acilistmodel.h"
+#include "acisteerings.h"
 #include <QMouseEvent>
 #include <QWheelEvent>
 
@@ -19,12 +20,15 @@ public:
     virtual ~ACIPageNavigation();
     int current() {return m_current;}
 
-//    void handleRelease();
 
 signals:
     void loadView(QString aView);
+    void loadSteering(QString aSteering);
     void currentChanged();
     void handleRelease();
+    void handleRot(int direction);
+    void handleDirUp();
+    void handleDirDown();
 
 public slots:
     void init();
@@ -42,11 +46,17 @@ public:
     virtual ~ACIMainViewModel();
 
     ACIListModel* getModel(){ return m_mainMenu; }
+    void setPageNavigation(ACIPageNavigation *pageNav){ m_pageNavigation=pageNav; }
 
 signals:
     void listModelChanged(QObject* aNewModel);
+    void loadMedia();
+    void loadSettings();
+private slots:
+    void listModelClicked(Item itemClicked);
 private:
     ACIListModel *m_mainMenu;
+    ACIPageNavigation *m_pageNavigation;
 };
 
 
@@ -63,6 +73,7 @@ public:
 Q_SIGNALS:
     void navigateToWidget(int);
     void navigateToPreviousWidget();
+
 
 
 public slots:
@@ -83,6 +94,7 @@ private:
     bool m_bCtrlFirstRun;
     QString m_sPreviousSignal;
     ACIMedia *m_oMedia;
+    ACISteerings *m_oSteerings;
     ACIVideoView *m_oVideoView;    
     ACISettings *m_oSettings;
     QObject *m_oCurrentView;

@@ -2,10 +2,12 @@ import QtQuick 2.5
 
 Item {
     id: settingsView;
-
+    objectName: "ACISettingsView.qml"
     signal goUp
     signal goDown
     signal update
+
+    anchors.fill: parent
 
     function handleDirUp(){
         console.log("settingsView.handleDirUp");

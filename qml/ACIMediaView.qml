@@ -1,24 +1,25 @@
 import QtQuick 2.5
 
 Item {
+    // ==> properties
     id: acimediaview;
+    objectName: "ACIMediaView.qml"
+    anchors.fill: parent;
+
+    // ==> signals
     signal goUp
     signal goDown
 
-
-
+    // ==> functions
     function handleDirUp(){
-        console.log("acimediaview.handleDirUp");
         goUp();
     }    
 
     function handleRelease() {
-        console.log("acimediaview.handleRelease");
         list.model.listClicked(list.currentIndex);
     }
 
     function handleRot(direction){
-        console.log("acimediaview.handleRot: "+direction)
         if(direction === 0){
             rotateCW();
         } else {
@@ -48,6 +49,7 @@ Item {
         rotateCW();
     }
 
+    // ==> QML elements
     Rectangle { id: acimediaviewbackground; anchors.fill: parent; color: "#636363" }
 
     ListView {

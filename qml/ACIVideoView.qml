@@ -3,6 +3,9 @@ import QtMultimedia 5.5
 
 Item {
     id: videoView;
+    property string g_cssprefix: Qt.platform.os==="windows"?"file:///D:/temp/ws/arcomivi/arcomivi/":"/usr/share/arcomivi/";
+    property string m_sPrefix: "css/media/active/10/"
+
     signal exitVideo
     signal completedLoading
 
@@ -21,7 +24,7 @@ Item {
     }
 
     function handleDirDown(){
-        videoSteering.visible = true;
+        steerVideoGrid.visible = true;
         videoSteeringTimer.restart();
     }
 
@@ -30,15 +33,26 @@ Item {
     }
 
     function handleRot(direction){
-        console.log("videoView.handleRot"+direction)
+        steerVideoGrid.visible = true;
+        videoSteeringTimer.restart();
+
         if(direction===0){
-            video.seek(video.position + 2000)
+//            video.seek(video.position + 2000)
+            if((steerVideoGrid.currentIndex + 1) < steerVideoGrid.count){
+                steerVideoGrid.currentIndex = steerVideoGrid.currentIndex + 1;
+            }
+            steerVideoGrid.positionViewAtIndex(steerVideoGrid.currentIndex, GridView.Visible);
         } else {
-            video.seek(video.position - 2000)
+            if((steerVideoGrid.currentIndex-1)  >=0){
+                steerVideoGrid.currentIndex = steerVideoGrid.currentIndex-1;
+            }
+            steerVideoGrid.positionViewAtIndex(steerVideoGrid.currentIndex, GridView.Visible);
+//            video.seek(video.position - 2000)
         }
     }
     Timer { id: videoSteeringTimer; repeat: false; interval: 4000;
-        onTriggered: videoSteering.visible = false;
+        onTriggered: { steerVideoGrid.visible = false;
+        console.log("video timer triggered.....")}
     }
 
     Rectangle { anchors.fill: parent; color: "black" }
@@ -48,28 +62,35 @@ Item {
         anchors.fill: parent; anchors.centerIn: parent;
     }
 
-    Rectangle {
-        id: videoSteering;
-        color: Qt.rgba(0.0,0.0,0.0,0.8);
+    property alias aGridModel: steerVideoGrid.model
 
-        Text {
-            id: videoSteeringText
-            renderType: Text.NativeRendering
-            text: qsTr("Steering Video");
-            color: "white"
-            anchors.centerIn: parent;
-        }
+    GridView {
+        id: steerVideoGrid;
+        width: parent.width; height: 50;
+        cellHeight: 50;
+        cellWidth: parent.width / steerVideoGrid.count
         anchors.bottom: parent.bottom;
-        width: parent.width;
-        height: 50;
-        visible: false;
+        model: $steerings.steerVideoModel
+        delegate: ACIButton {
+            height: parent.height
+            width: steerVideoGrid.cellWidth
+            pngname: name
+            text: ""
+            borderWidth.width: GridView.isCurrentItem ? 1:0;
+            btnImg: g_cssprefix + m_sPrefix + pngname +".png"
+            btnImgPressed: g_cssprefix + "css/media/inactive/"+pngname+".png"
 
+            onClicked: {
+                steerVideoGrid.currentIndex = index;
+                aGridModel.listClicked(steerVideoGrid.currentIndex);
+            }
+        }
     }
     MouseArea {
         anchors.fill: parent;
         onClicked: {
             console.log("parent video clicked")
-            videoSteering.visible = true;
+            steerVideoGrid.visible = true;
             videoSteeringTimer.restart();
 //            video.playbackState == MediaPlayer.PlayingState ? video.pause() : video.play();
         }

@@ -6,16 +6,14 @@ Item {
     height: parent.height
 
     //signals
-    signal clicked
+    signal clicked(int index)
 
     //properties
-    property bool active: false;
-
     property alias text: btnText.text
     property alias imgScale: buttonImage.scale
     property string pngname
     property bool keyUsing: false
-    property int borderWidth: 0;
+    property alias borderWidth: buttonBorder.border
     //property color borderColor: Qt.rgba(0.0, 0.0, 0.0, 0.0)
 
 
@@ -33,10 +31,10 @@ Item {
 
     //functions
     function setButtonReleased(){
-        if(active){
-            buttonBorder.border.width = 1;
+        if(buttonBorder.border.width===0){
+            borderWidth.width = 1;
         } else {
-            buttonBorder.border.width = 0;
+            borderWidth.width = 0;
         }
     }
 
@@ -52,15 +50,10 @@ Item {
         activate();
     }
     function activate(){
-        console.log("active: "+active);
-        active = !active;
-        if(active){
-            buttonBorder.border.width = 1;
-            buttonBorder.border.color = "orange"
-//            buttonImage.source = btnImgPressed;
+        if(borderWidth===0){
+            borderWidth.width = 1;
         } else {
-            buttonBorder.border.width = 0;
-//            buttonImage.source = btnImg;
+            borderWidth.width = 0;
         }
         console.log("===> buttonBorder.border.width= "+buttonBorder.border.width+" for pngname= "+pngname);
     }
@@ -74,7 +67,7 @@ Item {
         anchors.fill: buttonRoot
 //        color: buttonRoot.borderColor
         border.color: "orange"
-        border.width: borderWidth;
+        border.width: 0;
         radius: 0
     }
 
@@ -85,7 +78,7 @@ Item {
 
         onReleased: {
             setButtonReleased();
-            buttonRoot.clicked();
+            buttonRoot.clicked(index);
         }
 
         onPressed: {
