@@ -74,11 +74,10 @@ Item {
         delegate: ACIButton {
             height: parent.height
             width: steerVideoGrid.cellWidth
-            pngname: name
-            text: ""
+            btnOpacity: 0.5
             borderWidth.width: GridView.isCurrentItem ? 1:0;
-            btnImg: g_cssprefix + m_sPrefix + pngname +".png"
-            btnImgPressed: g_cssprefix + "css/media/inactive/"+pngname+".png"
+            btnImg: g_cssprefix + m_sPrefix + name +".png"
+            btnImgPressed: g_cssprefix + "css/media/inactive/"+name+".png"
 
             onClicked: {
                 steerVideoGrid.currentIndex = index;
@@ -92,7 +91,6 @@ Item {
             console.log("parent video clicked")
             steerVideoGrid.visible = true;
             videoSteeringTimer.restart();
-//            video.playbackState == MediaPlayer.PlayingState ? video.pause() : video.play();
         }
     }
 }

@@ -17,9 +17,7 @@ ACISteerings::ACISteerings(QObject *parent) : QObject(parent){
     m_steerVideo = new ACIListModel();
     m_steerVideo->addItem(Item("volup", ""));
     m_steerVideo->addItem(Item("voldown", ""));
-    m_steerVideo->addItem(Item("last", ""));
     m_steerVideo->addItem(Item("play", ""));
-    m_steerVideo->addItem(Item("next", ""));
 }
 
 //!

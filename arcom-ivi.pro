@@ -3,6 +3,7 @@ QT += multimedia multimediawidgets
 QT += positioning
 QT += location
 QT += serialport
+
 QTPLUGIN += gstreamercamerabin
 
 TARGET = arcomivi

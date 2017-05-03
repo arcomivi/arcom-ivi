@@ -9,6 +9,7 @@ Item {
     signal clicked(int index)
 
     //properties
+    property alias btnOpacity: buttonBorder.opacity
     property alias text: btnText.text
     property alias imgScale: buttonImage.scale
     property string pngname
@@ -55,7 +56,6 @@ Item {
         } else {
             borderWidth.width = 0;
         }
-        console.log("===> buttonBorder.border.width= "+buttonBorder.border.width+" for pngname= "+pngname);
     }
 
 
@@ -65,10 +65,9 @@ Item {
         id: buttonBorder
         color: "#636363";
         anchors.fill: buttonRoot
-//        color: buttonRoot.borderColor
         border.color: "orange"
         border.width: 0;
-        radius: 0
+        radius: 0        
     }
 
     MouseArea {
