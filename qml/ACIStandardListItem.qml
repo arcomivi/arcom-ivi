@@ -1,5 +1,5 @@
 import QtQuick 2.5
-
+import ACIStyle 1.0
 Item {
     id: standardListItem;
     width: Math.floor(parent.width);
@@ -19,7 +19,7 @@ Item {
             text: descr
             font {
                 family: "Helvetica";
-                pixelSize: 17;
+                pixelSize: ACIStyle.listFontpixelSize
                 bold: true
             }
             color: standardListItem.ListView.isCurrentItem ? "#B5C808" : (value2===""?"white": value2 )

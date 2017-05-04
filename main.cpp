@@ -61,11 +61,8 @@ int main(int argc, char *argv[]){
     ACILogger::getInstance()->setConsoleOut(true);
 
     ACIConfig::instance()->initConfig();
+    qmlRegisterSingletonType(ACIConfig::instance()->getQmlPrefix()+"ACIStyle.qml", "ACIStyle", 1, 0, "ACIStyle");
 
-    //w.setAttribute(Qt::WA_TranslucentBackground);
-    //w.setAutoFillBackground(false);
-    //w.setAttribute(Qt::WA_OpaquePaintEvent, true);
-    //w.setAttribute(Qt::WA_NoSystemBackground);
 
 
     TRACE_CONSOLE("Start...READY=1");

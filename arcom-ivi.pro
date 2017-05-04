@@ -94,7 +94,8 @@ DISTFILES += \
     qml/ACISettingsView.qml \
     qml/ACIVideoView.qml \
     qml/ACINaviView.qml \
-    qml/ACISelectScreen.qml
+    qml/ACISelectScreen.qml \
+    qml/ACIStyle.qml
 
 OTHER_FILES += \
     css/*

@@ -25,7 +25,6 @@ void ACIMainController::run(){
 
     m_oSteerings = new ACISteerings();
 
-
     //signals from objects:
     connect(m_oSettings, SIGNAL(update()), m_oSettings, SLOT(updateMe()));
     connect(m_oSettings, SIGNAL(screenSelected(int)), this, SLOT(screenSelected(int)));
@@ -41,6 +40,11 @@ void ACIMainController::run(){
     QDesktopWidget *desktopWidget = QApplication::desktop();
 
     oMainview = new ACIMainview(m_oPageNavigation);
+
+    //w.setAttribute(Qt::WA_TranslucentBackground);
+    //w.setAutoFillBackground(false);
+    //w.setAttribute(Qt::WA_OpaquePaintEvent, true);
+    //w.setAttribute(Qt::WA_NoSystemBackground);
 
     connect(oMainview, SIGNAL(loadMedia()), m_oMedia, SLOT(loadMedia()));
     //context properties must be loaded before loading the QML, if possible ;-)

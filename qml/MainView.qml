@@ -1,6 +1,7 @@
 import QtQuick 2.5
 
 //import ACIElements 1.0
+import ACIStyle 1.0
 
 Item {
     id: mainview
@@ -9,18 +10,9 @@ Item {
     property int m_current: -1
     property string g_cssprefix: Qt.platform.os==="windows"?"file:///D:/temp/ws/arcomivi/arcomivi/":"/usr/share/arcomivi/";
 
-    signal navigateTo(int widget);
-    signal zoominNavi;
-    signal zoomoutNavi;
-
-    signal loadSettings
-    signal loadMedia    
-
-
-
     //  ==> functions
     Connections {
-        target: $media        
+        target: $media
     }
 
     Connections {
@@ -33,12 +25,10 @@ Item {
         }
 
         onLoadSteering: {
-            console.log("LoadSteering: "+aSteering);
             viewSteerings.goToSteering(aSteering)
         }
 
         onHandleRelease: {
-            //console.log("pageNavigation::handleRelease()")
             mainview.children[$pageNavigation.current].handleRelease();
         }
 
