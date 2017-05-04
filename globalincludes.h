@@ -20,8 +20,16 @@
 #include <QtXml/QXmlDefaultHandler>
 #include <QStorageInfo>
 #include <QDesktopWidget>
+#include <QApplication>
 #include <QtSerialPort/QSerialPortInfo>
 #include <QtSerialPort/QSerialPort>
+#include <QStorageInfo>
+#include <QMouseEvent>
+#include <QWheelEvent>
+#include <QGuiApplication>
+#include <QMainWindow>
+#include <QScreen>
+#include <QQmlContext>
 
 #ifdef Q_OS_LINUX
 #include <QtDBus/QDBusConnection>

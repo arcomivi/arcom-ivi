@@ -167,7 +167,10 @@ Rectangle {
                     steerings.backToPrevious();
                 }                
             },
-
+            //99 - empty
+            SteerEmpty {
+                id: steerEmpty;
+            }
 //            //1
 //            SteerVideo {
 //                id: steerVideo
@@ -256,10 +259,7 @@ Rectangle {
 //                onGoBack: steerings.backToPrevious();
 //            }
 
-            //99 - empty
-            SteerEmpty {
-                id: steerEmpty;
-            }
+
         ]
     }
 }

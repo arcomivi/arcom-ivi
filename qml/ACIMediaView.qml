@@ -41,14 +41,6 @@ Item {
         list.positionViewAtIndex(list.currentIndex, ListView.Center);
     }
 
-    function handlePrevious(){
-        rotateCCW();
-    }
-
-    function handleNext(){
-        rotateCW();
-    }
-
     // ==> QML elements
     Rectangle { id: acimediaviewbackground; anchors.fill: parent; color: "#636363" }
 

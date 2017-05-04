@@ -9,36 +9,29 @@ Item {
     property int m_current: -1
     property string g_cssprefix: Qt.platform.os==="windows"?"file:///D:/temp/ws/arcomivi/arcomivi/":"/usr/share/arcomivi/";
 
-    signal update
-    signal restart
     signal navigateTo(int widget);
     signal zoominNavi;
     signal zoomoutNavi;
 
     signal loadSettings
     signal loadMedia    
-    signal screenSelected(int screen)
 
 
 
     //  ==> functions
     Connections {
-        target: $media
-        onWatchVideo:{
-            console.log("chooseScreen..........................");
-            $pageNavigation.current=5;
-            genericLoader.source = "";
-            genericLoader.source = "ACISelectScreen.qml";
-        }
+        target: $media        
     }
 
     Connections {
         target: $pageNavigation
+
         onLoadView: {
             console.log("LoadView: "+aView);
             viewsSwitcher.goToView(0, aView);
             mainview.children[$pageNavigation.current].handleEnter();
         }
+
         onLoadSteering: {
             console.log("LoadSteering: "+aSteering);
             viewSteerings.goToSteering(aSteering)
@@ -208,11 +201,6 @@ Item {
     }
     Connections {
         target: genericLoader.item;
-        onScreenSelected: {
-            console.log("onScreenSelected: "+screen);
-            mainview.screenSelected(screen);
-            genericLoader.source = "";
-            $pageNavigation.current=1;
-        }
+
     }
 }

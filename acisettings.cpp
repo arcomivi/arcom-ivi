@@ -4,17 +4,43 @@
 #include <QtSerialPort/QSerialPort>
 #include <QtSerialPort/QSerialPortInfo>
 
+
 ACISettings::ACISettings(QObject *parent) : QObject(parent)
 {
+    m_oScreens = Q_NULLPTR;
     m_oSettingsModel = new ACIListModel();
     connect(m_oSettingsModel, SIGNAL(itemClicked(Item)), this, SLOT(settingsModelClicked(Item)));
     m_oSettingsModel->addItem(Item("SETTINGS_UPDATE", "Update", "Update", "folder"));
     m_oSettingsModel->addItem(Item("SETTINGS_QUIT", "Quit", "Quit", "folder"));
 }
 
+//!
+//! \brief ACISettings::getModel
+//! \return
+//!
 ACIListModel *ACISettings::getModel()
 {
     return m_oSettingsModel;
+}
+
+//!
+//! \brief ACISettings::getScreens
+//! \return
+//!
+ACIListModel *ACISettings::getScreens()
+{
+    if(m_oScreens==Q_NULLPTR){
+        m_oScreens=new ACIListModel();
+        connect(m_oScreens, SIGNAL(itemClicked(Item)), this, SLOT(screensModelClicked(Item)));
+    }
+    m_oScreens->removeRows(0, m_oScreens->rowCount());
+    m_oScreens->addItem(Item("SCREEN_EXIT", "<- Exit / Back"));
+
+    QDesktopWidget *desktopWidget = QApplication::desktop();
+    for (int screen = 0; screen < desktopWidget->screenCount(); ++screen) {
+        m_oScreens->addItem(Item(QString("SCREEN_%1").arg(screen), QString("SCREEN - %1").arg(screen), QString("%1").arg(screen)));
+    }
+    return m_oScreens;
 }
 
 void ACISettings::settingsModelClicked(Item itemClicked){
@@ -64,4 +90,93 @@ void ACISettings::settingsModelClicked(Item itemClicked){
 //            }
 //        }
     }
+}
+
+//!
+//! \brief ACISettings::screensModelClicked
+//! \param itemClicked - item that was clicked
+//!
+void ACISettings::screensModelClicked(Item itemClicked){
+    TRACE(QString("Name: %1, Descr: %2, Value: %3")
+          .arg(itemClicked.name())
+          .arg(itemClicked.descr())
+          .arg(itemClicked.value()));
+    QString name = itemClicked.name();
+    if(name.compare("SCREEN_EXIT")==0){
+        emit m_pageNavigation->loadView("ACIMediaView.qml");
+        emit m_pageNavigation->loadSteering("0");
+    } else {
+        emit screenSelected(itemClicked.value().toInt());
+    }
+}
+
+//!
+//! \brief ACIMainview::updateMe
+//!
+void ACISettings::updateMe(){
+    //    //TODO: move to separate helper class
+    TRACE("updating1...");
+
+    //    QString update_dir="not-found";
+    TRACE("updating2...");
+    //#ifdef Q_OS_LINUX
+    //    QList<QStorageInfo> logicalDrives = QStorageInfo::mountedVolumes();
+    TRACE("updating3...");
+    QString update_dir="";
+    foreach (const QStorageInfo &storage, QStorageInfo::mountedVolumes()) {
+        if (storage.isValid() && storage.isReady()) {
+            if (!storage.isReadOnly()) {
+                // ...
+            }
+            if(storage.rootPath() == "/"){
+                update_dir = storage.rootPath() + "update";
+            } else {
+                update_dir = storage.rootPath() + "/update";
+            }
+        }
+
+        //    foreach(QString drive, logicalDrives){
+        //        if(drive=="/"){
+        //            update_dir = drive + "update";
+        //        } else {
+        //            update_dir = drive + "/update";
+        //        }
+        TRACE(QString("usb: %1").arg(update_dir));
+        QDir dir(update_dir);
+        if(dir.exists()){
+            //check if there is an updater.sh script as well
+            QString updateScript("%1/updater.sh");
+            QFile updateFile(updateScript.arg(update_dir));
+            if(updateFile.exists()){
+                break;
+            }
+        }
+        TRACE(QString("updater.sh not found under %1").arg(update_dir));
+        update_dir="not-found";
+    }
+    TRACE("updating4...");
+
+    TRACE(QString("done searching: %1").arg(update_dir));
+    //check if equals to: not-found
+    if(update_dir.compare("not-found", Qt::CaseInsensitive)==0){
+        TRACE("no updates found");
+        ////        emit displayNotification("No update folder found!");
+
+        return;
+    }
+
+
+    //    //0. do some checks
+    if(update_dir==""){
+        TRACE("update_dir empty");
+        return;
+    }
+    QString updateScript(update_dir+"/updater.sh "+update_dir+"/repo");
+    TRACE("start "+updateScript);
+    system(updateScript.toLatin1().data());
+    TRACE("end "+updateScript);
+    QGuiApplication::quit();
+    //#endif
+    ////    emit displayNotification(QString("... update done!"));
+    TRACE("exit");
 }

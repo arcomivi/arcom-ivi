@@ -1,9 +1,9 @@
 #include <QApplication>
 #include <QGuiApplication>
-#include <QScreen>
 #include "globalincludes.h"
 #include "aciconfig.h"
 #include "acimainview.h"
+#include "acimaincontroller.h"
 #include <QLabel>
 #include <QImage>
 #include <QPixmap>
@@ -11,7 +11,6 @@
 
 
 int main(int argc, char *argv[]){
-
 
     QNetworkProxy proxy;
     proxy.setType(QNetworkProxy::HttpProxy);
@@ -27,6 +26,8 @@ int main(int argc, char *argv[]){
     QCoreApplication::setOrganizationName("ArCom-IVI");
     QCoreApplication::setOrganizationDomain("arcom-ivi.de");
     QCoreApplication::setApplicationName("ArComIVI");
+
+    ACIMainController *controller = new ACIMainController();
 
 //    Test with 2 cameras:
 //    QFoo *bar = new QFoo(0);
@@ -69,19 +70,6 @@ int main(int argc, char *argv[]){
 
     TRACE_CONSOLE("Start...READY=1");
 
-//    gets information of the available desktops screens
-    QDesktopWidget *desktopWidget = QApplication::desktop();
-
-    ACIMainview *oMainview = new ACIMainview();
-    oMainview->setQmlFile(ACIConfig::instance()->getQmlPrefix()+"MainView.qml");
-    oMainview->setFlags(Qt::FramelessWindowHint);
-    oMainview->setResizeMode(QQuickView::SizeRootObjectToView);
-
-    oMainview->setGeometry(ACIConfig::instance()->getx(),
-                           ACIConfig::instance()->gety(),
-                           ACIConfig::instance()->getw()==0?desktopWidget->screenGeometry(0).width():ACIConfig::instance()->getw(),
-                           ACIConfig::instance()->geth()==0?desktopWidget->screenGeometry(0).height():ACIConfig::instance()->geth());
-    oMainview->show();
-//    qDebug() << "S C R E E N S: " << a.screens().count();
+    controller->run();
     return a.exec();
 }

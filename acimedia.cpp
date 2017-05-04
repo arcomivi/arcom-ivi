@@ -31,8 +31,8 @@ ACIListModel *ACIMedia::getModel()
     return this->m_oMediaModel;
 }
 
-void ACIMedia::loadMedia()
-{
+void ACIMedia::loadMedia(){
+    TRACE("Loading media...");
     m_oMediaModel->removeRows(0, m_oMediaModel->rowCount());
 
     if(m_iMediaType==MEDIA_INITIAL){
@@ -141,7 +141,9 @@ void ACIMedia::mediaModelClicked(Item itemClicked){
         emit mediaChanged();
     } else if(name.compare("VIDEO")==0){
         m_sCurrentVideo = itemClicked.value();
-        emit watchVideo(itemClicked.value());
+//        emit watchVideo();
+        emit m_pageNavigation->loadView("ACISelectScreen.qml");
+        emit m_pageNavigation->loadSteering("1");
     }
     TRACE("exit");
 }
