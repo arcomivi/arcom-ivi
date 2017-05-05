@@ -4,7 +4,7 @@
 #include <QObject>
 #include "aciconfig.h"
 #include "aciusbcontroller.h"
-
+#include "acipagenavigation.h"
 
 class ACIVideoView : public QQuickView
 {
@@ -14,10 +14,11 @@ public:
     void setQmlFile(QString qml);
     void keyPressEvent(QKeyEvent *e);
     QString m_sCurrentVideo;
+    ACIPageNavigation *getPageNav(){ return m_oPageNavigation; }
 public slots:
     void playVideo();
 private:
-
+    ACIPageNavigation *m_oPageNavigation;
 };
 
 #endif // ACIVIDEOVIEW_H

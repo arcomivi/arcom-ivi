@@ -4,6 +4,7 @@
 #include "acilogger.h"
 
 #include <QObject>
+#include <QMap>
 
 class ACIPageNavigation : public QObject
 {
@@ -14,11 +15,12 @@ public:
     virtual ~ACIPageNavigation();
     int current() {return m_current;}
 
-
+    QMap<QString, QString> m_map;
 signals:
     void loadView(QString aView);
     void loadSteering(QString aSteering);
     void currentChanged();
+    void handlePush();
     void handleRelease();
     void handleRot(int direction);
     void handleDirUp();
@@ -29,6 +31,7 @@ public slots:
     void setCurrent(int value) { m_current = value; }
 private:
     int m_current;
+
 };
 
 #endif // ACIPAGENAVIGATION_H

@@ -15,8 +15,6 @@ ACIPageNavigation::~ACIPageNavigation() {
 
 }
 
-
-
 //!
 //! \brief ACIPageNavigation::init
 //!

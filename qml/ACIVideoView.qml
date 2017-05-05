@@ -9,9 +9,31 @@ Item {
     signal exitVideo
     signal completedLoading
 
+    Connections {
+        target: $pageNavigation
+
+        onHandleRelease: {
+            videoView.handleRelease();
+        }
+
+        onHandleRot: {
+            videoView.handleRot(direction);
+        }
+
+        onHandleDirUp: {
+            videoView.handleDirUp();
+        }
+
+        onHandleDirDown: {
+            videoView.handleDirDown();
+        }
+    }
+
     function playVideo(){
         video.play();
     }
+
+
 
     function setVideoSource(name){
         console.log("Video: "+name);

@@ -32,22 +32,23 @@ class ACIMainview : public QQuickView
 {
     Q_OBJECT
 public:
-    explicit ACIMainview(ACIPageNavigation *pn, QQuickView *parent = 0);
+    explicit ACIMainview(QQuickView *parent = 0);
     void setQmlFile(QString qml);
+    ACIPageNavigation *getPageNav(){ return m_oPageNavigation; }
     void keyPressEvent(QKeyEvent *e);
     void mousePressEvent(QMouseEvent *e);
     void wheelEvent(QWheelEvent *e);
 
-Q_SIGNALS:
+signals:
     void loadMedia();
     void navigateToWidget(int);
-    void navigateToPreviousWidget();
 
 public slots:
-
+    void loadMediaView();
+    void loadSettingView();
+    void loadVideoView();
 
 private:
-    //structure with current and previous USB controller signal
     ACIMainViewModel *m_oMainViewModel;
     ACIPageNavigation *m_oPageNavigation;
 };

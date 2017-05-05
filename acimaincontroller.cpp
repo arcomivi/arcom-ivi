@@ -14,15 +14,9 @@ ACIMainController::ACIMainController(QObject *parent) : QObject(parent){
 //!
 void ACIMainController::run(){
 
-    m_oPageNavigation = new ACIPageNavigation();
-
-    m_oSettings=Q_NULLPTR;
+    m_oPageNavigation = Q_NULLPTR;
     m_oSettings = new ACISettings();
-    m_oSettings->setPageNavigation(m_oPageNavigation);
-
     m_oMedia = new ACIMedia();
-    m_oMedia->setPageNavigation(m_oPageNavigation);
-
     m_oSteerings = new ACISteerings();
 
     //signals from objects:
@@ -39,32 +33,33 @@ void ACIMainController::run(){
     //    gets information of the available desktops screens
     QDesktopWidget *desktopWidget = QApplication::desktop();
 
-    oMainview = new ACIMainview(m_oPageNavigation);
+    m_oMainview = new ACIMainview();
+    m_oPageNavigation=m_oMainview->getPageNav();
 
     //w.setAttribute(Qt::WA_TranslucentBackground);
     //w.setAutoFillBackground(false);
     //w.setAttribute(Qt::WA_OpaquePaintEvent, true);
     //w.setAttribute(Qt::WA_NoSystemBackground);
 
-    connect(oMainview, SIGNAL(loadMedia()), m_oMedia, SLOT(loadMedia()));
+    connect(m_oMainview, SIGNAL(loadMedia()), m_oMedia, SLOT(loadMedia()));
+    connect(m_oMedia, SIGNAL(videoClicked()), m_oMainview, SLOT(loadVideoView()));
+
     //context properties must be loaded before loading the QML, if possible ;-)
-    oMainview->rootContext()->setContextProperty("$settings", m_oSettings);
-    oMainview->rootContext()->setContextProperty("$media", m_oMedia);
-    oMainview->rootContext()->setContextProperty("$pageNavigation", m_oPageNavigation);
-
-    oMainview->rootContext()->setContextProperty("$steerings", m_oSteerings);
+    m_oMainview->rootContext()->setContextProperty("$settings", m_oSettings);
+    m_oMainview->rootContext()->setContextProperty("$media", m_oMedia);
+    m_oMainview->rootContext()->setContextProperty("$steerings", m_oSteerings);
 
 
 
-    oMainview->setQmlFile(ACIConfig::instance()->getQmlPrefix()+"MainView.qml");
-    oMainview->setFlags(Qt::FramelessWindowHint);
-    oMainview->setResizeMode(QQuickView::SizeRootObjectToView);
+    m_oMainview->setQmlFile(ACIConfig::instance()->getQmlPrefix()+"MainView.qml");
+    m_oMainview->setFlags(Qt::FramelessWindowHint);
+    m_oMainview->setResizeMode(QQuickView::SizeRootObjectToView);
 
-    oMainview->setGeometry(ACIConfig::instance()->getx(),
+    m_oMainview->setGeometry(ACIConfig::instance()->getx(),
                            ACIConfig::instance()->gety(),
                            ACIConfig::instance()->getw()==0?desktopWidget->screenGeometry(0).width():ACIConfig::instance()->getw(),
                            ACIConfig::instance()->geth()==0?desktopWidget->screenGeometry(0).height():ACIConfig::instance()->geth());
-    oMainview->show();
+    m_oMainview->show();
 }
 
 //!
@@ -74,10 +69,8 @@ void ACIMainController::run(){
 void ACIMainController::screenSelected(int screen){
     if(!m_oVideoView){
         m_oVideoView = new ACIVideoView();
-
+        m_oPageNavigation = m_oVideoView->getPageNav();
         m_oVideoView->rootContext()->setContextProperty("$steerings", m_oSteerings);
-        m_oVideoView->rootContext()->setContextProperty("$pageNavigation", m_oPageNavigation);
-
         m_oVideoView->setQmlFile(ACIConfig::instance()->getQmlPrefix()+"ACIVideoView.qml");
         m_oVideoView->setFlags(Qt::FramelessWindowHint);
         m_oVideoView->setResizeMode(QQuickView::SizeRootObjectToView);
@@ -105,6 +98,7 @@ void ACIMainController::exitVideo(){
 //    this->show();
     m_oVideoView->destroy();
     m_oVideoView = 0;
+    m_oPageNavigation=m_oMainview->getPageNav();
 }
 
 //!
@@ -198,14 +192,16 @@ void ACIMainController::onBroadcastCtrlEvent(QString event){
     //push is pressed and last was not pressed
     if(m_sCtrl.push == 1 && m_sCtrlPrev.push == 0){
         m_sCtrlPrev.push = m_sCtrl.push;
-        QMetaObject::invokeMethod((QObject*)oMainview->rootObject(), "handlePush", Qt::DirectConnection);
+        //QMetaObject::invokeMethod((QObject*)m_oMainview->rootObject(), "handlePush", Qt::DirectConnection);
+        emit m_oPageNavigation->handlePush();
         return;
     }
 
     //push button released
     if(m_sCtrl.push == 0 && m_sCtrlPrev.push == 1){
         m_sCtrlPrev.push = m_sCtrl.push;
-        QMetaObject::invokeMethod((QObject*)oMainview->rootObject(), "handleRelease", Qt::DirectConnection);
+        //QMetaObject::invokeMethod((QObject*)m_oMainview->rootObject(), "handleRelease", Qt::DirectConnection);
+        emit m_oPageNavigation->handleRelease();
         return;
     }
     //if not push or release, assign the last value
@@ -223,7 +219,8 @@ void ACIMainController::onBroadcastCtrlEvent(QString event){
             (m_sCtrlPrev.rot1 == 0 && m_sCtrlPrev.rot2 == 1 &&
              m_sCtrl.rot1 == 0 && m_sCtrl.rot2 == 0) ){
         TRACE("rotation clockwise");
-        QMetaObject::invokeMethod((QObject*)oMainview->rootObject(), "handleRot", Qt::DirectConnection, Q_ARG(QVariant, 0));
+        //QMetaObject::invokeMethod((QObject*)m_oMainview->rootObject(), "handleRot", Qt::DirectConnection, Q_ARG(QVariant, 0));
+        emit m_oPageNavigation->handleRot(0);
 
         m_sCtrlPrev.rot1 = m_sCtrl.rot1;
         m_sCtrlPrev.rot2 = m_sCtrl.rot2;
@@ -241,7 +238,8 @@ void ACIMainController::onBroadcastCtrlEvent(QString event){
             (m_sCtrlPrev.rot1 == 1 && m_sCtrlPrev.rot2 == 0 &&
              m_sCtrl.rot1 == 0 && m_sCtrl.rot2 == 0) ){
         TRACE("rotation counter clockwise");
-        QMetaObject::invokeMethod((QObject*)oMainview->rootObject(), "handleRot", Qt::DirectConnection, Q_ARG(QVariant, 1));
+        //QMetaObject::invokeMethod((QObject*)m_oMainview->rootObject(), "handleRot", Qt::DirectConnection, Q_ARG(QVariant, 1));
+        emit m_oPageNavigation->handleRot(1);
 
         m_sCtrlPrev.rot1 = m_sCtrl.rot1;
         m_sCtrlPrev.rot2 = m_sCtrl.rot2;
@@ -251,14 +249,16 @@ void ACIMainController::onBroadcastCtrlEvent(QString event){
     //down
     if(m_sCtrl.dir_down == 1 && m_sCtrlPrev.dir_down==0){
         m_sCtrlPrev.dir_down = m_sCtrl.dir_down;
-        QMetaObject::invokeMethod((QObject*)oMainview->rootObject(), "handleDirDown", Qt::DirectConnection);
+        //QMetaObject::invokeMethod((QObject*)m_oMainview->rootObject(), "handleDirDown", Qt::DirectConnection);
+        emit m_oPageNavigation->handleDirDown();
         return;
     }
     m_sCtrlPrev.dir_down = m_sCtrl.dir_down;
     //up
     if(m_sCtrl.dir_up == 1 && m_sCtrlPrev.dir_up==0){
         m_sCtrlPrev.dir_up = m_sCtrl.dir_up;
-        QMetaObject::invokeMethod((QObject*)oMainview->rootObject(), "handleDirUp", Qt::DirectConnection);
+        //QMetaObject::invokeMethod((QObject*)m_oMainview->rootObject(), "handleDirUp", Qt::DirectConnection);
+        emit m_oPageNavigation->handleDirUp();
         return;
     }
     m_sCtrlPrev.dir_up = m_sCtrl.dir_up;

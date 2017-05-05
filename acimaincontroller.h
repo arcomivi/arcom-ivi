@@ -31,7 +31,7 @@ private:
     ACIUsbCtrlSignals m_sCtrl, m_sCtrlPrev;
     QString m_sPreviousSignal;
     bool m_bCtrlFirstRun;
-    ACIMainview *oMainview;
+    ACIMainview *m_oMainview;
     ACIVideoView *m_oVideoView;
 
     ACIMedia *m_oMedia;

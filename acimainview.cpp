@@ -1,22 +1,32 @@
 #include "acimainview.h"
 
-
-ACIMainview::ACIMainview(ACIPageNavigation *pn, QQuickView *parent) :
-    QQuickView(parent)
-{
-    m_oPageNavigation=pn;
+//!
+//! \brief ACIMainview::ACIMainview
+//! \param parent
+//!
+ACIMainview::ACIMainview(QQuickView *parent) :
+    QQuickView(parent) {
     m_oMainViewModel = new ACIMainViewModel();
+    m_oPageNavigation = new ACIPageNavigation();
     this->rootContext()->setContextProperty("$mainViewModel", m_oMainViewModel);
+    this->rootContext()->setContextProperty("$pageNavigation", m_oPageNavigation);
     m_oMainViewModel->setPageNavigation(m_oPageNavigation);
 }
 
+//!
+//! \brief ACIMainview::setQmlFile
+//! \param qml
+//!
 void ACIMainview::setQmlFile(QString qml) {
     this->setSource(QUrl(qml));
-    connect(m_oMainViewModel, SIGNAL(loadMedia()), this, SIGNAL(loadMedia()));
+    connect(m_oMainViewModel, SIGNAL(loadMedia()), this, SLOT(loadMediaView()));
+    connect(m_oMainViewModel, SIGNAL(loadSettings()), this, SLOT(loadSettingView()));
 }
 
-
-
+//!
+//! \brief ACIMainview::keyPressEvent
+//! \param e
+//!
 void ACIMainview::keyPressEvent(QKeyEvent *e){
     TRACE(e->key());
     //(push) (rot rot) (dirl dirr dird diru)
@@ -108,7 +118,8 @@ void ACIMainview::mousePressEvent(QMouseEvent *e)
 
     if(e->button()==Qt::MouseButton::MidButton || e->button()==Qt::MouseButton::MiddleButton){
         qDebug() << "Qt::MidButton";
-        QMetaObject::invokeMethod((QObject*)this->rootObject(), "handleRelease", Qt::DirectConnection);
+        //QMetaObject::invokeMethod((QObject*)this->rootObject(), "handleRelease", Qt::DirectConnection);
+        emit m_oPageNavigation->handleRelease();
         return;
     }
     QQuickView::mousePressEvent(e);
@@ -125,6 +136,26 @@ void ACIMainview::wheelEvent(QWheelEvent *e)
         return;
     }
     QQuickView::wheelEvent(e);
+}
+
+void ACIMainview::loadMediaView()
+{
+    emit loadMedia();
+    m_oPageNavigation->setCurrent(1);
+    emit m_oPageNavigation->loadView("ACIMediaView.qml");
+    emit m_oPageNavigation->loadSteering("0");
+}
+
+void ACIMainview::loadSettingView()
+{
+    m_oPageNavigation->setCurrent(1);
+    emit m_oPageNavigation->loadView("ACISettingsView.qml");
+}
+
+void ACIMainview::loadVideoView()
+{
+    emit m_oPageNavigation->loadView("ACISelectScreen.qml");
+    emit m_oPageNavigation->loadSteering("1");
 }
 
 
@@ -161,13 +192,9 @@ void ACIMainViewModel::listModelClicked(Item itemClicked){
     QString name = itemClicked.name();
 
     if(name.compare("media")==0){
-        emit loadMedia();
-        m_pageNavigation->setCurrent(1);
-        emit m_pageNavigation->loadView("ACIMediaView.qml");
-        emit m_pageNavigation->loadSteering("0");
+        emit loadMedia();        
     } else if(name.compare("options")==0){
-        m_pageNavigation->setCurrent(1);
-        emit m_pageNavigation->loadView("ACISettingsView.qml");
+        emit loadSettings();
     }
 }
 

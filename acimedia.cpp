@@ -141,9 +141,8 @@ void ACIMedia::mediaModelClicked(Item itemClicked){
         emit mediaChanged();
     } else if(name.compare("VIDEO")==0){
         m_sCurrentVideo = itemClicked.value();
-//        emit watchVideo();
-        emit m_pageNavigation->loadView("ACISelectScreen.qml");
-        emit m_pageNavigation->loadSteering("1");
+        emit videoClicked();
+
     }
     TRACE("exit");
 }

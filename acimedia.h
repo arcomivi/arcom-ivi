@@ -3,8 +3,6 @@
 #include <QObject>
 #include "acilistmodel.h"
 #include "acimusicplayer.h"
-#include "acipagenavigation.h"
-
 
 
 class ACIMedia : public QObject
@@ -16,9 +14,7 @@ class ACIMedia : public QObject
     Q_PROPERTY(QString songTitle READ getSongTitle WRITE setSongTitle NOTIFY songTitleChanged)
 public:
     explicit ACIMedia(QObject *parent = 0);
-    ACIListModel* getModel();
-    void setPageNavigation(ACIPageNavigation *pageNav){ m_pageNavigation=pageNav; }
-
+    ACIListModel* getModel();    
 
     void displayMusic();
     void displayInitialMusic();
@@ -37,7 +33,7 @@ signals:
     void sendProgress(int);
     void songPositionChanged(QString);
     void songTitleChanged(QString);
-    void watchVideo();
+    void videoClicked();
 
     void listModelChanged(QObject* aNewModel);
     void progressChanged(int value);
@@ -92,8 +88,7 @@ private:
     QMediaPlaylist *m_musicPlayingPlaylist;
     QList<QMediaContent> m_songList;
     QList<QMediaContent> m_videoList;
-    bool m_bNewPlaylist;
-    ACIPageNavigation *m_pageNavigation;
+    bool m_bNewPlaylist;    
 };
 
 
