@@ -4,7 +4,7 @@ Item {
     id: rootMainMenu
 
     // ==> properties
-    property alias aGridModel: mainMenuGrid.model
+    property alias gridModel: mainMenuGrid.model    
     property int m_current: -1
 
     // ==> signals
@@ -25,7 +25,7 @@ Item {
     }
 
     function handleRelease(){
-        aGridModel.listClicked(mainMenuGrid.currentIndex);
+        gridModel.listClicked(mainMenuGrid.currentIndex);
     }
 
     function handlePush(){
@@ -70,7 +70,6 @@ Item {
     }
 
 
-
     GridView {
         id: mainMenuGrid;
         width: parent.width; height: parent.height;
@@ -80,97 +79,15 @@ Item {
             height: parent.height
             width: mainMenuGrid.cellWidth
             pngname: name
-            text: ""
+            text: index!=0?"":"HOME"
             borderWidth.width: GridView.isCurrentItem ? 1:0;
             btnImg: g_cssprefix + "css/mainmenu/active/"+ pngname +"013.png"
             btnImgPressed: g_cssprefix + "css/mainmenu/inactive/"+pngname+".png"
 
             onClicked: {
                 mainMenuGrid.currentIndex = index;
-                aGridModel.listClicked(mainMenuGrid.currentIndex);
+                gridModel.listClicked(mainMenuGrid.currentIndex);
             }
         }
     }
-//    Row {
-//        id: mainMenuRow;
-//        width: parent.width; height: parent.height;
-
-//        ACIButton {
-//            width: parent.width / noOfElements;
-//            height: parent.height
-//            id: mainmenu_bt_media
-//            keyUsing: true;
-//            pngname: "media"
-//            text: ""
-//            btnImg: g_cssprefix + "css/mainmenu/active/"+ pngname +"013.png"
-//            btnImgPressed: g_cssprefix + "css/mainmenu/inactive/"+pngname+".png"
-
-//            function setActive()   { setButtonActive();   }
-//            function setInactive() { setButtonInactive(); }
-//            function setClicked()  { setButtonClicked(); }
-//            function setReleased() { setButtonReleased(); }
-//            onClicked: {
-//                wasClicked = false;
-//                enterMedia();
-//            }
-//        }
-
-//        ACIButton {
-//            width: parent.width / noOfElements;
-//            height: parent.height
-//            id: mainmenu_bt_navi
-//            objectName: btnPrefix+"navi"
-//            //imgScale: 0.25
-//            keyUsing: true;
-//            opacity: 1
-//            pngname: "navi"
-//            text: ""
-//            btnImg: g_cssprefix + "css/mainmenu/active/"+ pngname +"013.png"
-//            btnImgPressed: g_cssprefix + "css/mainmenu/inactive/"+pngname+".png"
-
-//            function setActive()   { setButtonActive();   }
-//            function setInactive() { setButtonInactive(); }
-//            function setClicked()  { setButtonClicked(); }
-//            function setReleased() { setButtonReleased(); }
-//            onClicked: {
-//                wasClicked = false;
-//                enterNavigation();
-//            }
-//        }
-
-//        ACIButton {
-//            width: parent.width / noOfElements;
-//            height: parent.height
-//            id: mainmenu_bt_sync
-//            objectName: btnPrefix+"sync"
-//            //imgScale: 0.25
-//            keyUsing: true;
-//            opacity: 1
-//            pngname: "sync"
-//            text: ""
-//            btnImg: g_cssprefix + "css/mainmenu/active/"+ pngname +"013.png"
-//            btnImgPressed: g_cssprefix + "css/mainmenu/inactive/"+pngname+".png"
-//            onClicked: { wasClicked = false; }
-//        }
-
-//        ACIButton {
-//            width: parent.width / noOfElements;
-//            height: parent.height
-//            id: mainmenu_bt_options
-//            objectName: btnPrefix+"options"
-//            //imgScale: 0.25
-//            keyUsing: true;
-//            opacity: 1
-//            pngname: "options"
-//            text: ""
-//            btnImg: g_cssprefix + "css/mainmenu/active/"+ pngname +"013.png"
-//            btnImgPressed: g_cssprefix + "css/mainmenu/inactive/"+pngname+".png"
-
-////            function setActive()   { setButtonActive();   }
-////            function setInactive() { setButtonInactive(); }
-////            function setClicked()  { setButtonClicked(); }
-////            function setReleased() { setButtonReleased(); }
-//            onClicked: { wasClicked = false; enterSettings(); }
-//        }
-//    }
 }

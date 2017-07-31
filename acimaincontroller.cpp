@@ -4,28 +4,29 @@
 //! \brief ACIMainController::ACIMainController
 //! \param parent
 //!
-ACIMainController::ACIMainController(QObject *parent) : QObject(parent){
-    m_oVideoView = Q_NULLPTR;
-    m_bCtrlFirstRun=false;
+ACIMainController::ACIMainController(QObject *parent) : QObject(parent) {
+    m_videoView = Q_NULLPTR;
+    m_ctrlFirstRun=false;
 }
 
 //!
 //! \brief ACIMainController::run - start the main application
 //!
-void ACIMainController::run(){
+void ACIMainController::run() {
 
-    m_oPageNavigation = Q_NULLPTR;
-    m_oSettings = new ACISettings();
-    m_oMedia = new ACIMedia();
-    m_oSteerings = new ACISteerings();
+    m_pageNavigation = Q_NULLPTR;
+    m_settings = new ACISettings();
+    m_media = new ACIMedia();
+    m_steerings = new ACISteerings();
 
     //signals from objects:
-    connect(m_oSettings, SIGNAL(update()), m_oSettings, SLOT(updateMe()));
-    connect(m_oSettings, SIGNAL(screenSelected(int)), this, SLOT(screenSelected(int)));
+    connect(m_settings, SIGNAL(update()), m_settings, SLOT(updateMe()));
+    connect(m_settings, SIGNAL(screenSelected(int)), this, SLOT(screenSelected(int)));
 
-    connect(m_oSteerings, SIGNAL(play()), m_oMedia, SLOT(play()));
-    connect(m_oSteerings, SIGNAL(volup()), m_oMedia, SLOT(volup()));
-    connect(m_oSteerings, SIGNAL(voldown()), m_oMedia, SLOT(voldown()));
+
+    connect(m_steerings, SIGNAL(play()), m_media, SLOT(play()));
+    connect(m_steerings, SIGNAL(volup()), m_media, SLOT(volup()));
+    connect(m_steerings, SIGNAL(voldown()), m_media, SLOT(voldown()));
 
     QObject::connect(ACIUsbController::getInstance(), SIGNAL(broadcastCtrlEvent(QString)), this, SLOT(onBroadcastCtrlEvent(QString)));
     QTimer::singleShot(500, ACIUsbController::getInstance(), SLOT(connectCtrlSignal()));
@@ -33,79 +34,83 @@ void ACIMainController::run(){
     //    gets information of the available desktops screens
     QDesktopWidget *desktopWidget = QApplication::desktop();
 
-    m_oMainview = new ACIMainview();
-    m_oPageNavigation=m_oMainview->getPageNav();
+    m_mainView = new ACIMainview();
+    m_pageNavigation=m_mainView->getPageNav();
 
+    connect(m_settings, SIGNAL(screenExit()), m_mainView, SLOT(loadMediaView()));
     //w.setAttribute(Qt::WA_TranslucentBackground);
     //w.setAutoFillBackground(false);
     //w.setAttribute(Qt::WA_OpaquePaintEvent, true);
     //w.setAttribute(Qt::WA_NoSystemBackground);
 
-    connect(m_oMainview, SIGNAL(loadMedia()), m_oMedia, SLOT(loadMedia()));
-    connect(m_oMedia, SIGNAL(videoClicked()), m_oMainview, SLOT(loadVideoView()));
+    connect(m_mainView, SIGNAL(loadMedia()), m_media, SLOT(loadMedia()));
+    connect(m_media, SIGNAL(videoClicked()), m_mainView, SLOT(loadVideoView()));
 
     //context properties must be loaded before loading the QML, if possible ;-)
-    m_oMainview->rootContext()->setContextProperty("$settings", m_oSettings);
-    m_oMainview->rootContext()->setContextProperty("$media", m_oMedia);
-    m_oMainview->rootContext()->setContextProperty("$steerings", m_oSteerings);
+    m_mainView->rootContext()->setContextProperty("$settings", m_settings);
+    m_mainView->rootContext()->setContextProperty("$media", m_media);
+    m_mainView->rootContext()->setContextProperty("$steerings", m_steerings);
 
 
 
-    m_oMainview->setQmlFile(ACIConfig::instance()->getQmlPrefix()+"MainView.qml");
-    m_oMainview->setFlags(Qt::FramelessWindowHint);
-    m_oMainview->setResizeMode(QQuickView::SizeRootObjectToView);
+    m_mainView->setQmlFile(ACIConfig::instance()->getQmlPrefix()+"MainView.qml");
+    m_mainView->setFlags(Qt::FramelessWindowHint);
+    m_mainView->setResizeMode(QQuickView::SizeRootObjectToView);
 
-    m_oMainview->setGeometry(ACIConfig::instance()->getx(),
-                           ACIConfig::instance()->gety(),
-                           ACIConfig::instance()->getw()==0?desktopWidget->screenGeometry(0).width():ACIConfig::instance()->getw(),
-                           ACIConfig::instance()->geth()==0?desktopWidget->screenGeometry(0).height():ACIConfig::instance()->geth());
-    m_oMainview->show();
+    m_mainView->setGeometry(ACIConfig::instance()->getx(),
+                            ACIConfig::instance()->gety(),
+                            ACIConfig::instance()->getw()==0?desktopWidget->screenGeometry(0).width():ACIConfig::instance()->getw(),
+                            ACIConfig::instance()->geth()==0?desktopWidget->screenGeometry(0).height():ACIConfig::instance()->geth());
+    m_mainView->show();
+
 }
 
 //!
 //! \brief ACIMainController::screenSelected
 //! \param screen
 //!
-void ACIMainController::screenSelected(int screen){
-    if(!m_oVideoView){
-        m_oVideoView = new ACIVideoView();
-        m_oPageNavigation = m_oVideoView->getPageNav();
-        m_oVideoView->rootContext()->setContextProperty("$steerings", m_oSteerings);
-        m_oVideoView->setQmlFile(ACIConfig::instance()->getQmlPrefix()+"ACIVideoView.qml");
-        m_oVideoView->setFlags(Qt::FramelessWindowHint);
-        m_oVideoView->setResizeMode(QQuickView::SizeRootObjectToView);
+void ACIMainController::screenSelected(int screen) {
+    if(!m_videoView) {
+        m_videoView = new ACIVideoView();
+        m_pageNavigation = m_videoView->getPageNav();
+        m_videoView->rootContext()->setContextProperty("$steerings", m_steerings);
+        m_videoView->setQmlFile(ACIConfig::instance()->getQmlPrefix()+"ACIVideoView.qml");
+        m_videoView->setFlags(Qt::FramelessWindowHint);
+        m_videoView->setResizeMode(QQuickView::SizeRootObjectToView);
 
-        m_oVideoView->m_sCurrentVideo = m_oMedia->getCurrentVideo();
+        m_videoView->m_sCurrentVideo = m_media->getCurrentVideo();
 
-        connect((QObject*)m_oVideoView->rootObject(), SIGNAL(exitVideo()), this , SLOT(exitVideo()));
+        connect((QObject*)m_videoView->rootObject(), SIGNAL(exitVideo()), this, SLOT(exitVideo()));
     }
 
     QDesktopWidget *desktopWidget = QApplication::desktop();
-    m_oVideoView->setGeometry(ACIConfig::instance()->getx(),
-                              ACIConfig::instance()->gety(),
-                              ACIConfig::instance()->getw()==0?desktopWidget->screenGeometry(screen).width():ACIConfig::instance()->getw(),
-                              ACIConfig::instance()->geth()==0?desktopWidget->screenGeometry(screen).height():ACIConfig::instance()->geth());
-    m_oVideoView->show();
-    m_oVideoView->setScreen(qApp->screens()[screen]);
+    m_videoView->setGeometry(ACIConfig::instance()->getx(),
+                             ACIConfig::instance()->gety(),
+                             ACIConfig::instance()->getw()==0?desktopWidget->screenGeometry(screen).width():ACIConfig::instance()->getw(),
+                             ACIConfig::instance()->geth()==0?desktopWidget->screenGeometry(screen).height():ACIConfig::instance()->geth());
+    qDebug() << "desktopWidget->screenGeometry(screen).width(): " << desktopWidget->screenGeometry(screen).width();
+    qDebug() << "desktopWidget->screenGeometry(screen).height(): " << desktopWidget->screenGeometry(screen).height();
+    m_videoView->show();
+    m_videoView->setScreen(qApp->screens()[screen]);
 }
 
 //!
 //! \brief ACIMainController::exitVideo
 //!
-void ACIMainController::exitVideo(){
+void ACIMainController::exitVideo() {
     //TODO: investivate hide/show/focus
-//    m_oVideoView->hide();
-//    this->show();
-    m_oVideoView->destroy();
-    m_oVideoView = 0;
-    m_oPageNavigation=m_oMainview->getPageNav();
+    //    m_oVideoView->hide();
+    //    this->show();
+    m_videoView->destroy();
+    m_videoView = 0;
+    m_pageNavigation=m_mainView->getPageNav();
 }
 
 //!
 //! \brief ACIMainController::navigateTo
 //! \param widget
 //!
-void ACIMainController::navigateTo(int widget){
+void ACIMainController::navigateTo(int widget) {
     TRACE(widget);
     QProcess xwininfo;
     xwininfo.start("sh", QStringList() << "-c" << "xwininfo -int -name navit | grep \"Window id:\"");// | grep -o '[0-9]\{1,10\}'");
@@ -130,185 +135,185 @@ void ACIMainController::navigateTo(int widget){
     navWindow->setWindowFlags(Qt::FramelessWindowHint | Qt::WindowStaysOnTopHint);// | Qt::BypassWindowManagerHint);
     navWindow->move(0,75);
     navWindow->setFixedSize(
-                QGuiApplication::screens().at(0)->availableGeometry().width(),
-                350);
+        QGuiApplication::screens().at(0)->availableGeometry().width(),
+        350);
     navWindow->setCentralWidget(navWidget);
     navWindow->show();
 }
 
-void ACIMainController::onBroadcastCtrlEvent(QString event){
+void ACIMainController::onBroadcastCtrlEvent(QString event) {
 
     //if it's not the first run, compare with previous signal
     //if equals, do nothing
-    if(!m_bCtrlFirstRun){
-        if(event.compare(m_sPreviousSignal)==0){
+    if(!m_ctrlFirstRun) {
+        if(event.compare(m_previousSignal)==0) {
             return;
         }
     }
-    TRACE(QString("%1 -> %2").arg(m_sPreviousSignal).arg(event));
+    TRACE(QString("%1 -> %2").arg(m_previousSignal).arg(event));
 
     //read event signals:
     //volume rotation signals
-    m_sCtrl.vol_rot1 = event.at(0).digitValue();
-    m_sCtrl.vol_rot2 = event.at(1).digitValue();
+    m_ctrlSignal.vol_rot1 = event.at(0).digitValue();
+    m_ctrlSignal.vol_rot2 = event.at(1).digitValue();
 
     //push signal
-    m_sCtrl.push = event.at(2).digitValue();
+    m_ctrlSignal.push = event.at(2).digitValue();
 
     //direction signals
-    m_sCtrl.dir_left = event.at(3).digitValue();
-    m_sCtrl.dir_right = event.at(4).digitValue();
-    m_sCtrl.dir_down = event.at(5).digitValue();
-    m_sCtrl.dir_up = event.at(6).digitValue();
+    m_ctrlSignal.dir_left = event.at(3).digitValue();
+    m_ctrlSignal.dir_right = event.at(4).digitValue();
+    m_ctrlSignal.dir_down = event.at(5).digitValue();
+    m_ctrlSignal.dir_up = event.at(6).digitValue();
 
     //rotation signals
-    m_sCtrl.rot1 = event.at(7).digitValue();
-    m_sCtrl.rot2 = event.at(8).digitValue();
+    m_ctrlSignal.rot1 = event.at(7).digitValue();
+    m_ctrlSignal.rot2 = event.at(8).digitValue();
 
     //push button signal
-    m_sCtrl.vol_push = event.at(10).digitValue();
+    m_ctrlSignal.vol_push = event.at(10).digitValue();
 
     //first run
-    if(m_bCtrlFirstRun){
+    if(m_ctrlFirstRun) {
         TRACE("first run");
-        m_bCtrlFirstRun = false;
-        m_sCtrlPrev = m_sCtrl;
-        TRACE(QString("rotation: %1%2 -> %3%4").arg(m_sCtrlPrev.rot1).arg(m_sCtrlPrev.rot2).arg(m_sCtrl.rot1).arg(m_sCtrl.rot2));
+        m_ctrlFirstRun = false;
+        m_ctrlPreviousSignal = m_ctrlSignal;
+        TRACE(QString("rotation: %1%2 -> %3%4").arg(m_ctrlPreviousSignal.rot1).arg(m_ctrlPreviousSignal.rot2).arg(m_ctrlSignal.rot1).arg(m_ctrlSignal.rot2));
         return;
     }
-    m_sPreviousSignal=event;
+    m_previousSignal=event;
 
 
     //now do the comparison
     //    TRACE("volume push");
-    if(m_sCtrl.vol_push == 1 && m_sCtrlPrev.vol_push == 0){
-        m_sCtrlPrev.vol_push = m_sCtrl.vol_push;
+    if(m_ctrlSignal.vol_push == 1 && m_ctrlPreviousSignal.vol_push == 0) {
+        m_ctrlPreviousSignal.vol_push = m_ctrlSignal.vol_push;
         //        QMetaObject::invokeMethod(m_wMedia, "handleVolPush", Qt::DirectConnection);
         return;
     }
-    m_sCtrlPrev.vol_push = m_sCtrl.vol_push;
+    m_ctrlPreviousSignal.vol_push = m_ctrlSignal.vol_push;
 
     //    TRACE("push");
     //push is pressed and last was not pressed
-    if(m_sCtrl.push == 1 && m_sCtrlPrev.push == 0){
-        m_sCtrlPrev.push = m_sCtrl.push;
+    if(m_ctrlSignal.push == 1 && m_ctrlPreviousSignal.push == 0) {
+        m_ctrlPreviousSignal.push = m_ctrlSignal.push;
         //QMetaObject::invokeMethod((QObject*)m_oMainview->rootObject(), "handlePush", Qt::DirectConnection);
-        emit m_oPageNavigation->handlePush();
+        emit m_pageNavigation->handlePush();
         return;
     }
 
     //push button released
-    if(m_sCtrl.push == 0 && m_sCtrlPrev.push == 1){
-        m_sCtrlPrev.push = m_sCtrl.push;
+    if(m_ctrlSignal.push == 0 && m_ctrlPreviousSignal.push == 1) {
+        m_ctrlPreviousSignal.push = m_ctrlSignal.push;
         //QMetaObject::invokeMethod((QObject*)m_oMainview->rootObject(), "handleRelease", Qt::DirectConnection);
-        emit m_oPageNavigation->handleRelease();
+        emit m_pageNavigation->handleRelease();
         return;
     }
     //if not push or release, assign the last value
-    m_sCtrlPrev.push = m_sCtrl.push;
+    m_ctrlPreviousSignal.push = m_ctrlSignal.push;
 
     //    TRACE(QString("rotation: %1%2 -> %3%4").arg(m_sCtrlPrev.rot1).arg(m_sCtrlPrev.rot2).arg(m_sCtrl.rot1).arg(m_sCtrl.rot2));
     //===>rotation clockwise
     //00 -> 10, 10->11, 11->01, 01->00
-    if((m_sCtrlPrev.rot1 == 0 && m_sCtrlPrev.rot2 == 0 &&
-        m_sCtrl.rot1 == 1 && m_sCtrl.rot2 == 0) ||
-            (m_sCtrlPrev.rot1 == 1 && m_sCtrlPrev.rot2 == 0 &&
-             m_sCtrl.rot1 == 1 && m_sCtrl.rot2 == 1) ||
-            (m_sCtrlPrev.rot1 == 1 && m_sCtrlPrev.rot2 == 1 &&
-             m_sCtrl.rot1 == 0 && m_sCtrl.rot2 == 1) ||
-            (m_sCtrlPrev.rot1 == 0 && m_sCtrlPrev.rot2 == 1 &&
-             m_sCtrl.rot1 == 0 && m_sCtrl.rot2 == 0) ){
+    if((m_ctrlPreviousSignal.rot1 == 0 && m_ctrlPreviousSignal.rot2 == 0 &&
+            m_ctrlSignal.rot1 == 1 && m_ctrlSignal.rot2 == 0) ||
+            (m_ctrlPreviousSignal.rot1 == 1 && m_ctrlPreviousSignal.rot2 == 0 &&
+             m_ctrlSignal.rot1 == 1 && m_ctrlSignal.rot2 == 1) ||
+            (m_ctrlPreviousSignal.rot1 == 1 && m_ctrlPreviousSignal.rot2 == 1 &&
+             m_ctrlSignal.rot1 == 0 && m_ctrlSignal.rot2 == 1) ||
+            (m_ctrlPreviousSignal.rot1 == 0 && m_ctrlPreviousSignal.rot2 == 1 &&
+             m_ctrlSignal.rot1 == 0 && m_ctrlSignal.rot2 == 0) ) {
         TRACE("rotation clockwise");
         //QMetaObject::invokeMethod((QObject*)m_oMainview->rootObject(), "handleRot", Qt::DirectConnection, Q_ARG(QVariant, 0));
-        emit m_oPageNavigation->handleRot(0);
+        emit m_pageNavigation->handleRot(0);
 
-        m_sCtrlPrev.rot1 = m_sCtrl.rot1;
-        m_sCtrlPrev.rot2 = m_sCtrl.rot2;
+        m_ctrlPreviousSignal.rot1 = m_ctrlSignal.rot1;
+        m_ctrlPreviousSignal.rot2 = m_ctrlSignal.rot2;
         return;
     }
 
     //===>rotation counter clockwise
     //00<-10, 10<-11, 11<-01, 01<-00
-    if((m_sCtrlPrev.rot1 == 0 && m_sCtrlPrev.rot2 == 0 &&
-        m_sCtrl.rot1 == 0 && m_sCtrl.rot2 == 1) ||
-            (m_sCtrlPrev.rot1 == 0 && m_sCtrlPrev.rot2 == 1 &&
-             m_sCtrl.rot1 == 1 && m_sCtrl.rot2 == 1) ||
-            (m_sCtrlPrev.rot1 == 1 && m_sCtrlPrev.rot2 == 1 &&
-             m_sCtrl.rot1 == 1 && m_sCtrl.rot2 == 0) ||
-            (m_sCtrlPrev.rot1 == 1 && m_sCtrlPrev.rot2 == 0 &&
-             m_sCtrl.rot1 == 0 && m_sCtrl.rot2 == 0) ){
+    if((m_ctrlPreviousSignal.rot1 == 0 && m_ctrlPreviousSignal.rot2 == 0 &&
+            m_ctrlSignal.rot1 == 0 && m_ctrlSignal.rot2 == 1) ||
+            (m_ctrlPreviousSignal.rot1 == 0 && m_ctrlPreviousSignal.rot2 == 1 &&
+             m_ctrlSignal.rot1 == 1 && m_ctrlSignal.rot2 == 1) ||
+            (m_ctrlPreviousSignal.rot1 == 1 && m_ctrlPreviousSignal.rot2 == 1 &&
+             m_ctrlSignal.rot1 == 1 && m_ctrlSignal.rot2 == 0) ||
+            (m_ctrlPreviousSignal.rot1 == 1 && m_ctrlPreviousSignal.rot2 == 0 &&
+             m_ctrlSignal.rot1 == 0 && m_ctrlSignal.rot2 == 0) ) {
         TRACE("rotation counter clockwise");
         //QMetaObject::invokeMethod((QObject*)m_oMainview->rootObject(), "handleRot", Qt::DirectConnection, Q_ARG(QVariant, 1));
-        emit m_oPageNavigation->handleRot(1);
+        emit m_pageNavigation->handleRot(1);
 
-        m_sCtrlPrev.rot1 = m_sCtrl.rot1;
-        m_sCtrlPrev.rot2 = m_sCtrl.rot2;
+        m_ctrlPreviousSignal.rot1 = m_ctrlSignal.rot1;
+        m_ctrlPreviousSignal.rot2 = m_ctrlSignal.rot2;
         return;
     }
     //===>directions:
     //down
-    if(m_sCtrl.dir_down == 1 && m_sCtrlPrev.dir_down==0){
-        m_sCtrlPrev.dir_down = m_sCtrl.dir_down;
+    if(m_ctrlSignal.dir_down == 1 && m_ctrlPreviousSignal.dir_down==0) {
+        m_ctrlPreviousSignal.dir_down = m_ctrlSignal.dir_down;
         //QMetaObject::invokeMethod((QObject*)m_oMainview->rootObject(), "handleDirDown", Qt::DirectConnection);
-        emit m_oPageNavigation->handleDirDown();
+        emit m_pageNavigation->handleDirDown();
         return;
     }
-    m_sCtrlPrev.dir_down = m_sCtrl.dir_down;
+    m_ctrlPreviousSignal.dir_down = m_ctrlSignal.dir_down;
     //up
-    if(m_sCtrl.dir_up == 1 && m_sCtrlPrev.dir_up==0){
-        m_sCtrlPrev.dir_up = m_sCtrl.dir_up;
+    if(m_ctrlSignal.dir_up == 1 && m_ctrlPreviousSignal.dir_up==0) {
+        m_ctrlPreviousSignal.dir_up = m_ctrlSignal.dir_up;
         //QMetaObject::invokeMethod((QObject*)m_oMainview->rootObject(), "handleDirUp", Qt::DirectConnection);
-        emit m_oPageNavigation->handleDirUp();
+        emit m_pageNavigation->handleDirUp();
         return;
     }
-    m_sCtrlPrev.dir_up = m_sCtrl.dir_up;
+    m_ctrlPreviousSignal.dir_up = m_ctrlSignal.dir_up;
     //left
-    if(m_sCtrl.dir_left == 1 && m_sCtrlPrev.dir_left==0){
-        m_sCtrlPrev.dir_left = m_sCtrl.dir_left;
+    if(m_ctrlSignal.dir_left == 1 && m_ctrlPreviousSignal.dir_left==0) {
+        m_ctrlPreviousSignal.dir_left = m_ctrlSignal.dir_left;
         //        QMetaObject::invokeMethod(m_wCurrentWidget, "handleDirLeft", Qt::DirectConnection);
         return;
     }
-    m_sCtrlPrev.dir_left = m_sCtrl.dir_left;
+    m_ctrlPreviousSignal.dir_left = m_ctrlSignal.dir_left;
     //right
-    if(m_sCtrl.dir_right == 1 && m_sCtrlPrev.dir_right==0){
-        m_sCtrlPrev.dir_right = m_sCtrl.dir_right;
+    if(m_ctrlSignal.dir_right == 1 && m_ctrlPreviousSignal.dir_right==0) {
+        m_ctrlPreviousSignal.dir_right = m_ctrlSignal.dir_right;
         //        QMetaObject::invokeMethod(m_wCurrentWidget, "handleDirRight", Qt::DirectConnection);
         return;
     }
-    m_sCtrlPrev.dir_right = m_sCtrl.dir_right;
+    m_ctrlPreviousSignal.dir_right = m_ctrlSignal.dir_right;
 
 
     //===>rotation clockwise
     //00 -> 10, 10->11, 11->01, 01->00
-    if((m_sCtrlPrev.vol_rot1 == 0 && m_sCtrlPrev.vol_rot2 == 0 &&
-        m_sCtrl.vol_rot1 == 1 && m_sCtrl.vol_rot2 == 0) ||
-            (m_sCtrlPrev.vol_rot1 == 1 && m_sCtrlPrev.vol_rot2 == 0 &&
-             m_sCtrl.vol_rot1 == 1 && m_sCtrl.vol_rot2 == 1) ||
-            (m_sCtrlPrev.vol_rot1 == 1 && m_sCtrlPrev.vol_rot2 == 1 &&
-             m_sCtrl.vol_rot1 == 0 && m_sCtrl.vol_rot2 == 1) ||
-            (m_sCtrlPrev.vol_rot1 == 0 && m_sCtrlPrev.vol_rot2 == 1 &&
-             m_sCtrl.vol_rot1 == 0 && m_sCtrl.vol_rot2 == 0) ){
+    if((m_ctrlPreviousSignal.vol_rot1 == 0 && m_ctrlPreviousSignal.vol_rot2 == 0 &&
+            m_ctrlSignal.vol_rot1 == 1 && m_ctrlSignal.vol_rot2 == 0) ||
+            (m_ctrlPreviousSignal.vol_rot1 == 1 && m_ctrlPreviousSignal.vol_rot2 == 0 &&
+             m_ctrlSignal.vol_rot1 == 1 && m_ctrlSignal.vol_rot2 == 1) ||
+            (m_ctrlPreviousSignal.vol_rot1 == 1 && m_ctrlPreviousSignal.vol_rot2 == 1 &&
+             m_ctrlSignal.vol_rot1 == 0 && m_ctrlSignal.vol_rot2 == 1) ||
+            (m_ctrlPreviousSignal.vol_rot1 == 0 && m_ctrlPreviousSignal.vol_rot2 == 1 &&
+             m_ctrlSignal.vol_rot1 == 0 && m_ctrlSignal.vol_rot2 == 0) ) {
 
 
-        m_sCtrlPrev.vol_rot1 = m_sCtrl.vol_rot1;
-        m_sCtrlPrev.vol_rot2 = m_sCtrl.vol_rot2;
+        m_ctrlPreviousSignal.vol_rot1 = m_ctrlSignal.vol_rot1;
+        m_ctrlPreviousSignal.vol_rot2 = m_ctrlSignal.vol_rot2;
         return;
     }
 
     //===>rotation counter clockwise
     //00<-10, 10<-11, 11<-01, 01<-00
-    if((m_sCtrlPrev.vol_rot1 == 0 && m_sCtrlPrev.vol_rot2 == 0 &&
-        m_sCtrl.vol_rot1 == 0 && m_sCtrl.vol_rot2 == 1) ||
-            (m_sCtrlPrev.vol_rot1 == 0 && m_sCtrlPrev.vol_rot2 == 1 &&
-             m_sCtrl.vol_rot1 == 1 && m_sCtrl.vol_rot2 == 1) ||
-            (m_sCtrlPrev.vol_rot1 == 1 && m_sCtrlPrev.vol_rot2 == 1 &&
-             m_sCtrl.vol_rot1 == 1 && m_sCtrl.vol_rot2 == 0) ||
-            (m_sCtrlPrev.vol_rot1 == 1 && m_sCtrlPrev.vol_rot2 == 0 &&
-             m_sCtrl.vol_rot1 == 0 && m_sCtrl.vol_rot2 == 0) ){
+    if((m_ctrlPreviousSignal.vol_rot1 == 0 && m_ctrlPreviousSignal.vol_rot2 == 0 &&
+            m_ctrlSignal.vol_rot1 == 0 && m_ctrlSignal.vol_rot2 == 1) ||
+            (m_ctrlPreviousSignal.vol_rot1 == 0 && m_ctrlPreviousSignal.vol_rot2 == 1 &&
+             m_ctrlSignal.vol_rot1 == 1 && m_ctrlSignal.vol_rot2 == 1) ||
+            (m_ctrlPreviousSignal.vol_rot1 == 1 && m_ctrlPreviousSignal.vol_rot2 == 1 &&
+             m_ctrlSignal.vol_rot1 == 1 && m_ctrlSignal.vol_rot2 == 0) ||
+            (m_ctrlPreviousSignal.vol_rot1 == 1 && m_ctrlPreviousSignal.vol_rot2 == 0 &&
+             m_ctrlSignal.vol_rot1 == 0 && m_ctrlSignal.vol_rot2 == 0) ) {
 
 
-        m_sCtrlPrev.vol_rot1 = m_sCtrl.vol_rot1;
-        m_sCtrlPrev.vol_rot2 = m_sCtrl.vol_rot2;
+        m_ctrlPreviousSignal.vol_rot1 = m_ctrlSignal.vol_rot1;
+        m_ctrlPreviousSignal.vol_rot2 = m_ctrlSignal.vol_rot2;
         return;
     }
 }

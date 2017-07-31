@@ -1,5 +1,5 @@
 ﻿<config>
-<geometry><x>100</x><y>600</y><w>480</w><h>320</h></geometry>
+<geometry><x>100</x><y>100</y><w>480</w><h>320</h></geometry>
 <cssfile>/usr/share/arcom/css/arcomivi.qss</cssfile>
 <log><loglevel>3</loglevel><logconsole>1</logconsole></log>
 </config>
