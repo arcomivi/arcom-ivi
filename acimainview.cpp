@@ -19,6 +19,7 @@ ACIMainview::ACIMainview(QQuickView *parent) :
 //!
 void ACIMainview::setQmlFile(QString qml) {
     this->setSource(QUrl(qml));
+    connect(m_mainViewModel, SIGNAL(loadHome()), this, SLOT(loadHomeView()));
     connect(m_mainViewModel, SIGNAL(loadMedia()), this, SLOT(loadMediaView()));
     connect(m_mainViewModel, SIGNAL(loadSettings()), this, SLOT(loadSettingView()));
 }
@@ -206,6 +207,11 @@ void ACIMainview::wheelEvent(QWheelEvent *e) {
     QQuickView::wheelEvent(e);
 }
 
+void ACIMainview::loadHomeView() {
+    m_pageNavigation->setCurrent(0);
+    emit m_pageNavigation->loadView("ACIHomeView.qml");
+}
+
 void ACIMainview::loadMediaView() {
     emit loadMedia();
     m_pageNavigation->setCurrent(1);
@@ -257,7 +263,9 @@ void ACIMainViewModel::listModelClicked(Item itemClicked) {
 
     QString name = itemClicked.name();
 
-    if(name.compare("media")==0) {
+    if(name=="home") {
+        emit loadHome();
+    } else if(name.compare("media")==0) {
         emit loadMedia();
     } else if(name.compare("options")==0) {
         emit loadSettings();

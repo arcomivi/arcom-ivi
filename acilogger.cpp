@@ -4,15 +4,15 @@
 
 ACILogger* ACILogger::m_Instance = 0;
 
-ACILogger::~ACILogger(){
+ACILogger::~ACILogger() {
     m_LogFile->close();
 }
 
 /**
  * writes log into the file
  */
-void ACILogger::log(QString log, int level){
-
+void ACILogger::log(QString log, int level) {
+    Q_UNUSED(level);
     if(m_bConsoleOut) TRACE_CONSOLE(log);
 
     //for 0 do nothing
@@ -25,15 +25,15 @@ void ACILogger::log(QString log, int level){
 /**
  * do loggging setup
  */
-void ACILogger::setupLog(){
+void ACILogger::setupLog() {
     TRACE_CONSOLE("setupLog");
     m_iLogLevel = 0;
     m_bLogOpened = false;
     m_bConsoleOut = false;
     m_sLogFileName = ACIConfig::instance()->homePath()+".arcomivi/logs/acilog.txt";
     QDir logs(ACIConfig::instance()->homePath()+".arcomivi/logs");
-    if(!logs.exists()){
-#ifdef Q_OS_LINUX        
+    if(!logs.exists()) {
+#ifdef Q_OS_LINUX
         system(QString("mkdir -p %1/.arcomivi/logs").arg(ACIConfig::instance()->homePath()).toLatin1());
 #endif
 
@@ -44,7 +44,7 @@ void ACILogger::setupLog(){
     rotateLogFiles();
     m_LogFile = new QFile(m_sLogFileName);
 
-    if(!m_LogFile->open(QIODevice::ReadWrite | QIODevice::Truncate | QIODevice::Text)){
+    if(!m_LogFile->open(QIODevice::ReadWrite | QIODevice::Truncate | QIODevice::Text)) {
         qDebug() << m_sLogFileName << " could not be opened!";
         m_bLogOpened = false;
         return;
@@ -65,21 +65,21 @@ void ACILogger::setupLog(){
  * 1 - info
  * 2 - debug( all )
  */
-void ACILogger::setLogLevel(int v){
+void ACILogger::setLogLevel(int v) {
     m_iLogLevel = v;
 }
 
 /**
  *
  */
-void ACILogger::setConsoleOut(bool v){
+void ACILogger::setConsoleOut(bool v) {
     m_bConsoleOut = v;
 }
 
 /**
  * rotate log files
  */
-void ACILogger::rotateLogFiles(){
+void ACILogger::rotateLogFiles() {
     if(m_sLogFileName=="") return;
     TRACE_CONSOLE(QString("Log file %1 exists.").arg(m_sLogFileName));
     if(!QFile::exists(m_sLogFileName)) return;
@@ -90,7 +90,7 @@ void ACILogger::rotateLogFiles(){
     QString ftemp = "";
     QString ftempRotated = "";
 
-    for(int i = 2; i>=0; i--){
+    for(int i = 2; i>=0; i--) {
         ftemp = "%1%2";
         ftempRotated = "%1%2";
         ftemp = ftemp.arg(m_sLogFileName).arg(i);

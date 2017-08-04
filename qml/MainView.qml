@@ -1,6 +1,4 @@
-import QtQuick 2.5
-
-//import ACIElements 1.0
+import QtQuick 2.6
 import ACIStyle 1.0
 
 Item {
@@ -21,21 +19,11 @@ Item {
             viewsSwitcher.goToView(0, aView);
             mainview.children[$pageNavigation.current].handleEnter();
         }
-        onLoadSteering: {
-            viewSteerings.goToSteering(aSteering)
-        }
-        onHandleRelease: {
-            mainview.children[$pageNavigation.current].handleRelease();
-        }
-        onHandleRot: {
-            mainview.children[$pageNavigation.current].handleRot(direction);
-        }
-        onHandleDirUp: {
-            mainview.children[$pageNavigation.current].handleDirUp();
-        }
-        onHandleDirDown: {
-            mainview.children[$pageNavigation.current].handleDirDown();
-        }
+        onLoadSteering: viewSteerings.goToSteering(aSteering);
+        onHandleRelease: mainview.children[$pageNavigation.current].handleRelease();
+        onHandleRot: mainview.children[$pageNavigation.current].handleRot(direction);
+        onHandleDirUp: mainview.children[$pageNavigation.current].handleDirUp();
+        onHandleDirDown: mainview.children[$pageNavigation.current].handleDirDown();
     }
 
     Component.onCompleted: {
@@ -93,41 +81,9 @@ Item {
             //0
             //ACIHomeView
             //ACIMedia - list: Music, Video, Pictures, Radio, Television
-            //ACIMusic - list: all from Music,
-            //ACIVideo - list: all from Videos
-            //ACIPictures - list: all from Pictures
-            //ACIRadio - list: radio stations
-            //ACITelevision - list: Streams, DVB
-
-            //0
-//            Loader { id: homeViewLoader; anchors.fill: parent; }
-//            ,
-//            //1
-//            Loader { id: mediaViewLoader; anchors.fill: parent; },
-//            //2
-//            Loader { id: settingsViewLoader; anchors.fill: parent; },
-//            //3
-//            Loader { id: naviViewLoader; anchors.fill: parent; }
+            //ACISettingsView
         ]
 
-//        Connections {
-//            target: mediaViewLoader.item;
-//            onGoUp: {
-//                mainview.m_current = 0;
-//                mainview.children[m_current].handleEnter();
-//            }
-//        }
-
-//        Connections {
-//            target: settingsViewLoader.item;
-//            onGoUp: {
-//                mainview.m_current = 0;
-//                mainview.children[m_current].handleEnter();
-//            }
-//            onUpdate: {
-//                mainview.update();
-//            }
-//        }
     }
 
     //(m_current === 2)
@@ -151,24 +107,4 @@ Item {
             bottom: mainview.bottom;
         }
     }
-
-//    //(m_current === 4)
-//    Loader { id: videoLoader; anchors.fill: parent;
-//        function handleRot(direction){
-//            videoLoader.item.handleRot(direction);
-//        }
-//    }
-//    //(m_current === 5)
-//    Loader { id: genericLoader; anchors.fill: parent;
-//        function handleRot(direction){
-//            genericLoader.item.handleRot(direction);
-//        }
-//        function handleRelease(){
-//            genericLoader.item.handleRelease();
-//        }
-//    }
-//    Connections {
-//        target: genericLoader.item;
-
-//    }
 }

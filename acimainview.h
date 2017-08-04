@@ -21,6 +21,7 @@ class ACIMainViewModel : public QObject {
 
     signals:
         void listModelChanged(QObject* aNewModel);
+        void loadHome();
         void loadMedia();
         void loadSettings();
     private slots:
@@ -48,6 +49,7 @@ class ACIMainview : public QQuickView {
         void navigateToWidget(int);
 
     public slots:
+        void loadHomeView();
         void loadMediaView();
         void loadSettingView();
         void loadVideoView();
