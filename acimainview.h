@@ -25,7 +25,7 @@ class ACIMainViewModel : public QObject {
         void loadMedia();
         void loadSettings();
     private slots:
-        void listModelClicked(Item itemClicked);
+        void listModelClicked(Item *itemClicked);
     private:
         ACIListModel *m_mainMenu;
         ACIPageNavigation *m_pageNavigation;

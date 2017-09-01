@@ -28,8 +28,8 @@ class ACISettings : public QObject {
     public slots:
         void updateMe();
     private slots:
-        void settingsModelClicked(Item);
-        void screensModelClicked(Item);
+        void settingsModelClicked(Item*);
+        void screensModelClicked(Item*);
 
 
     private:

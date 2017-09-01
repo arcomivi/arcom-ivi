@@ -1,5 +1,5 @@
 #include "acimainview.h"
-
+#include <QUrl>
 //!
 //! \brief ACIMainview::ACIMainview
 //! \param parent
@@ -236,12 +236,12 @@ void ACIMainview::loadVideoView() {
 //!
 ACIMainViewModel::ACIMainViewModel(QObject *parent) : QObject(parent) {
     m_mainMenu = new ACIListModel();
-    m_mainMenu->addItem(Item("home", ""));
-    m_mainMenu->addItem(Item("media", ""));
-    m_mainMenu->addItem(Item("navi", ""));
-    m_mainMenu->addItem(Item("sync", ""));
-    m_mainMenu->addItem(Item("options", ""));
-    connect(m_mainMenu, SIGNAL(itemClicked(Item)), this, SLOT(listModelClicked(Item)));
+    m_mainMenu->addItem(new Item("home", ""));
+    m_mainMenu->addItem(new Item("media", "", "", "", "", QUrl("file:///D:/temp/ws/arcomivi/arcomivi/css/mainmenu/active/media013.png")));
+    m_mainMenu->addItem(new Item("navi", "", "", "", "", QUrl("file:///D:/temp/ws/arcomivi/arcomivi/css/mainmenu/active/navi013.png")));
+    m_mainMenu->addItem(new Item("sync", "", "", "", "", QUrl("file:///D:/temp/ws/arcomivi/arcomivi/css/mainmenu/active/sync013.png")));
+    m_mainMenu->addItem(new Item("options", "", "", "", "", QUrl("file:///D:/temp/ws/arcomivi/arcomivi/css/mainmenu/active/options013.png")));
+    connect(m_mainMenu, SIGNAL(itemClicked(Item*)), this, SLOT(listModelClicked(Item*)));
 }
 
 //!
@@ -255,13 +255,13 @@ ACIMainViewModel::~ACIMainViewModel() {
 //! \brief ACIMainViewModel::listModelClicked
 //! \param itemClicked
 //!
-void ACIMainViewModel::listModelClicked(Item itemClicked) {
+void ACIMainViewModel::listModelClicked(Item *itemClicked) {
     TRACE(QString("Name: %1, Descr: %2, Value: %3")
-          .arg(itemClicked.name())
-          .arg(itemClicked.descr())
-          .arg(itemClicked.value()));
+          .arg(itemClicked->name())
+          .arg(itemClicked->descr())
+          .arg(itemClicked->value()));
 
-    QString name = itemClicked.name();
+    QString name = itemClicked->name();
 
     if(name=="home") {
         emit loadHome();

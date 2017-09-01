@@ -9,8 +9,8 @@ ACISettings::ACISettings(QObject *parent) : QObject(parent) {
     m_screens = Q_NULLPTR;
     m_settingsModel = new ACIListModel();
     connect(m_settingsModel, SIGNAL(itemClicked(Item)), this, SLOT(settingsModelClicked(Item)));
-    m_settingsModel->addItem(Item("SETTINGS_UPDATE", "Update", "Update", "folder"));
-    m_settingsModel->addItem(Item("SETTINGS_QUIT", "Quit", "Quit", "folder"));
+    m_settingsModel->addItem(new Item("SETTINGS_UPDATE", "Update", "Update", "folder"));
+    m_settingsModel->addItem(new Item("SETTINGS_QUIT", "Quit", "Quit", "folder"));
 }
 
 //!
@@ -31,21 +31,21 @@ ACIListModel *ACISettings::getScreens() {
         connect(m_screens, SIGNAL(itemClicked(Item)), this, SLOT(screensModelClicked(Item)));
     }
     m_screens->removeRows(0, m_screens->rowCount());
-    m_screens->addItem(Item("SCREEN_EXIT", "<- Exit / Back"));
+    m_screens->addItem(new Item("SCREEN_EXIT", "<- Exit / Back"));
 
     QDesktopWidget *desktopWidget = QApplication::desktop();
     for (int screen = 0; screen < desktopWidget->screenCount(); ++screen) {
-        m_screens->addItem(Item(QString("SCREEN_%1").arg(screen), QString("SCREEN - %1").arg(screen), QString("%1").arg(screen)));
+        m_screens->addItem(new Item(QString("SCREEN_%1").arg(screen), QString("SCREEN - %1").arg(screen), QString("%1").arg(screen)));
     }
     return m_screens;
 }
 
-void ACISettings::settingsModelClicked(Item itemClicked) {
+void ACISettings::settingsModelClicked(Item *itemClicked) {
     TRACE(QString("Name: %1, Descr: %2, Value: %3")
-          .arg(itemClicked.name())
-          .arg(itemClicked.descr())
-          .arg(itemClicked.value()));
-    QString name = itemClicked.name();
+          .arg(itemClicked->name())
+          .arg(itemClicked->descr())
+          .arg(itemClicked->value()));
+    QString name = itemClicked->name();
 
     if(name.compare("SETTINGS_QUIT")==0) {
         QApplication::quit();
@@ -93,18 +93,18 @@ void ACISettings::settingsModelClicked(Item itemClicked) {
 //! \brief ACISettings::screensModelClicked
 //! \param itemClicked - item that was clicked
 //!
-void ACISettings::screensModelClicked(Item itemClicked) {
+void ACISettings::screensModelClicked(Item *itemClicked) {
     TRACE(QString("Name: %1, Descr: %2, Value: %3")
-          .arg(itemClicked.name())
-          .arg(itemClicked.descr())
-          .arg(itemClicked.value()));
-    QString name = itemClicked.name();
+          .arg(itemClicked->name())
+          .arg(itemClicked->descr())
+          .arg(itemClicked->value()));
+    QString name = itemClicked->name();
     if(name.compare("SCREEN_EXIT")==0) {
         emit screenExit();
         //        emit m_pageNavigation->loadView("ACIMediaView.qml");
         //        emit m_pageNavigation->loadSteering("0");
     } else {
-        emit screenSelected(itemClicked.value().toInt());
+        emit screenSelected(itemClicked->value().toInt());
     }
 }
 

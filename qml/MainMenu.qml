@@ -4,7 +4,7 @@ Item {
     id: rootMainMenu
 
     // ==> properties
-    property alias gridModel: mainMenuGrid.model    
+    property var gridModel;
     property int m_current: -1
 
     // ==> signals
@@ -26,6 +26,7 @@ Item {
 
     function handleRelease(){
         gridModel.listClicked(mainMenuGrid.currentIndex);
+        console.log(gridModel[mainMenuGrid.currentIndex]);
     }
 
     function handlePush(){
@@ -75,15 +76,13 @@ Item {
         width: parent.width; height: parent.height;
         cellHeight: parent.height;
         cellWidth: parent.width / mainMenuGrid.count
+        model: gridModel
         delegate: ACIButton {
             height: parent.height
             width: mainMenuGrid.cellWidth
-            pngname: name
+            buttonModel: model.itemData;
             text: index!=0?"":"HOME"
             borderWidth.width: GridView.isCurrentItem ? 1:0;
-            btnImg: g_cssprefix + "css/mainmenu/active/"+ pngname +"013.png"
-            btnImgPressed: g_cssprefix + "css/mainmenu/inactive/"+pngname+".png"
-
             onClicked: {
                 mainMenuGrid.currentIndex = index;
                 gridModel.listClicked(mainMenuGrid.currentIndex);

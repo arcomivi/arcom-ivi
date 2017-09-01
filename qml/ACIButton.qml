@@ -9,6 +9,7 @@ Item {
     signal clicked(int index)
 
     //properties
+    property var buttonModel;
     property alias btnOpacity: buttonBorder.opacity
     property alias text: btnText.text
     property alias imgScale: buttonImage.scale
@@ -87,7 +88,7 @@ Item {
 
     Image {
         id: buttonImage
-        source: btnImg
+        source: buttonModel.imageSource
         anchors.centerIn: parent
         fillMode: Image.Pad;
         smooth: false;
