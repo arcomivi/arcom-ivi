@@ -25,7 +25,7 @@ class ACISteerings : public QObject {
         void voldown();
 
     public slots:
-        void steerMusicModelClicked(Item *itemClicked);
+
     private:
         ACIListModel *m_steerMusic;
         ACIListModel *m_steerVideo;

@@ -1,31 +1,29 @@
 import QtQuick 2.5
 
 Item {
-    id: settingsView;
+    id: root;
     objectName: "ACISettingsView.qml"
+    anchors.fill: parent
     signal goUp
     signal goDown
     signal update
 
-    anchors.fill: parent
-
     function handleDirUp(){
-        console.log("settingsView.handleDirUp");
         goUp();
     }
 
     function handleRelease() {
-        console.log("settingsView.handleRelease");
-        settingsList.model.listClicked(settingsList.currentIndex);
+        settingsList.currentItem.buttonModel.released();
     }
 
     function handleRot(direction){
-        console.log("settingsView.handleRot: "+direction)
+        settingsList.currentItem.buttonModel.active=false;
         if(direction === 0){
             rotateCW();
         } else {
             rotateCCW();
         }
+        settingsList.currentItem.buttonModel.active=true;
     }
 
     function rotateCW(){
@@ -51,14 +49,9 @@ Item {
         focus: true
         anchors.fill: parent;
         clip: true;
-        delegate:
-            ACIStandardListItem {
+        delegate: ACIStandardListItem {
             height: Math.floor(settingsList.height / 5);
-
-            onItemClicked: {
-                settingsList.currentIndex = index;
-                $settings.listModel.listClicked(settingsList.currentIndex);
-            }
+            buttonModel: model.itemData
         }
 
         Component.onCompleted: {

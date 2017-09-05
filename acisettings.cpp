@@ -8,9 +8,16 @@
 ACISettings::ACISettings(QObject *parent) : QObject(parent) {
     m_screens = Q_NULLPTR;
     m_settingsModel = new ACIListModel();
-    connect(m_settingsModel, SIGNAL(itemClicked(Item)), this, SLOT(settingsModelClicked(Item)));
-    m_settingsModel->addItem(new Item("SETTINGS_UPDATE", "Update", "Update", "folder"));
-    m_settingsModel->addItem(new Item("SETTINGS_QUIT", "Quit", "Quit", "folder"));
+
+    Item *item=new Item("SETTINGS_UPDATE", "Update", "Update", "folder");
+    connect(item, &Item::itemReleased, this, &ACISettings::updateMe);
+    m_settingsModel->addItem(item);
+
+    item=new Item("SETTINGS_QUIT", "Quit", "Quit", "folder");
+    connect(item, &Item::itemReleased, [=]() {
+        QApplication::quit();
+    });
+    m_settingsModel->addItem(item);
 }
 
 //!

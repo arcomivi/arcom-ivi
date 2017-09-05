@@ -15,9 +15,9 @@ class ACIMedia : public QObject {
         explicit ACIMedia(QObject *parent = 0);
         ACIListModel* getModel();
 
-        void displayMusic();
-        void displayInitialMusic();
-        void displayAllSongs();
+        //        void displayMusic();
+
+
 
         void displayInitialVideo();
         void displayAllVideos();
@@ -26,7 +26,7 @@ class ACIMedia : public QObject {
         }
 
         int getProgress() {
-            return m_iProgress;
+            return m_progress;
         }
         QString getSongPosition() {
             return m_sSongPosition;
@@ -36,7 +36,6 @@ class ACIMedia : public QObject {
         }
 
     signals:
-        void mediaChanged();
         void sendProgress(int);
         void songPositionChanged(QString);
         void songTitleChanged(QString);
@@ -46,14 +45,18 @@ class ACIMedia : public QObject {
         void progressChanged(int value);
 
     public slots:
+        void displayInitialMedia();
+        void displayInitialMusic();
+        void displayAllSongs();
+        void songClicked();
         //TODO: refactor to cpp
         void setSongPosition(QString value) {
             m_sSongPosition=value;
             emit songPositionChanged(m_sSongPosition);
         }
         void setProgress(int value) {
-            m_iProgress=value;
-            emit progressChanged(m_iProgress);
+            m_progress=value;
+            emit progressChanged(m_progress);
         }
         void setSongTitle(QString value) {
             m_sTitle=value;
@@ -61,7 +64,7 @@ class ACIMedia : public QObject {
         }
 
         void loadMedia();
-        void mediaModelClicked(Item *itemClicked);
+        //        void mediaModelClicked(Item *itemClicked);
         void volup();
         void voldown();
         void play();
@@ -69,6 +72,7 @@ class ACIMedia : public QObject {
         void currentListIndexChanged(int listIndex);
 
     private:
+        void loadSongs(QString path);
         enum {
             MEDIA_INITIAL = -1,
             MEDIA_MUSIC,
@@ -93,18 +97,18 @@ class ACIMedia : public QObject {
         };
         QString m_sTitle;
         QString m_sSongPosition;
-        int m_iProgress;
-        int m_iMediaType;
-        int m_iMusicType;
-        int m_iVideoType;
-        int m_iPreviousCurrentListIndex;
+        int m_progress;
+        int m_mediaType;
+        int m_musicType;
+        int m_videoType;
+        int m_previousListIndex;
         QString m_sCurrentVideo;
-        ACIListModel *m_oMediaModel;
-        ACIMusicPlayer *m_oMusicPlayer;
+        ACIListModel *m_mediaModel;
+        ACIMusicPlayer *m_musicPlayer;
         QMediaPlaylist *m_musicPlayingPlaylist;
         QList<QMediaContent> m_songList;
         QList<QMediaContent> m_videoList;
-        bool m_bNewPlaylist;
+        bool m_newPlaylist;
 };
 
 

@@ -5,40 +5,23 @@
 //! \param parent
 //!
 ACISteerings::ACISteerings(QObject *parent) : QObject(parent) {
-
+    //Audio Steerings
     m_steerMusic = new ACIListModel();
-    m_steerMusic->addItem(new Item("volup", ""));
-    m_steerMusic->addItem(new Item("voldown", ""));
-    m_steerMusic->addItem(new Item("last", ""));
-    m_steerMusic->addItem(new Item("play", ""));
-    m_steerMusic->addItem(new Item("next", ""));
-    connect(m_steerMusic, SIGNAL(itemClicked(Item)), this, SLOT(steerMusicModelClicked(Item)));
+    Item *item = new Item("volup", "", "", "", "", QUrl("file:///D:/temp/ws/arcomivi/arcomivi/css/media/active/10/volup.png"));
+    m_steerMusic->addItem(item);
 
+    m_steerMusic->addItem(new Item("voldown", "", "", "", "", QUrl("file:///D:/temp/ws/arcomivi/arcomivi/css/media/active/10/voldown.png")));
+    m_steerMusic->addItem(new Item("last", "", "", "", "", QUrl("file:///D:/temp/ws/arcomivi/arcomivi/css/media/active/10/last.png")));
+
+    item = new Item("play", "", "", "", "", QUrl("file:///D:/temp/ws/arcomivi/arcomivi/css/media/active/10/play.png"));
+    connect(item, &Item::itemReleased, this, &ACISteerings::play);
+    m_steerMusic->addItem(item);
+
+    m_steerMusic->addItem(new Item("next", "", "", "", "", QUrl("file:///D:/temp/ws/arcomivi/arcomivi/css/media/active/10/next.png")));
+
+    //Video Steerings
     m_steerVideo = new ACIListModel();
-    m_steerVideo->addItem(new Item("volup", ""));
-    m_steerVideo->addItem(new Item("voldown", ""));
-    m_steerVideo->addItem(new Item("play", ""));
-}
-
-//!
-//! \brief ACISteerings::steerMusicModelClicked
-//! \param itemClicked
-//!
-void ACISteerings::steerMusicModelClicked(Item *itemClicked) {
-    TRACE(QString("Name: %1, Descr: %2, Value: %3")
-          .arg(itemClicked->name())
-          .arg(itemClicked->descr())
-          .arg(itemClicked->value()));
-    QString name = itemClicked->name();
-    if(name.compare("play")==0) {
-        emit play();
-    } else if(name.compare("volup")==0) {
-        emit volup();
-    } else if(name.compare("voldown")==0) {
-        emit voldown();
-    } else if(name.compare("last")==0) {
-
-    } else if(name.compare("next")==0) {
-
-    }
+    m_steerVideo->addItem(new Item("volup", "", "", "", "", QUrl("file:///D:/temp/ws/arcomivi/arcomivi/css/media/active/10/volup.png")));
+    m_steerVideo->addItem(new Item("voldown", "", "", "", "", QUrl("file:///D:/temp/ws/arcomivi/arcomivi/css/media/active/10/voldown.png")));
+    m_steerVideo->addItem(new Item("play", "", "", "", "", QUrl("file:///D:/temp/ws/arcomivi/arcomivi/css/media/active/10/play.png")));
 }

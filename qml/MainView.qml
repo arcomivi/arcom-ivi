@@ -15,11 +15,11 @@ Item {
     Connections {
         target: $pageNavigation
         onLoadView: {
-            console.log("LoadView: "+aView);
-            viewsSwitcher.goToView(0, aView);
+            console.log("LoadView: "+view);
+            viewsSwitcher.goToView(0, view);
             mainview.children[$pageNavigation.current].handleEnter();
         }
-        onLoadSteering: viewSteerings.goToSteering(aSteering);
+        onLoadSteering: viewSteerings.loadSteering(steering);
         onHandleRelease: mainview.children[$pageNavigation.current].handleRelease();
         onHandleRot: mainview.children[$pageNavigation.current].handleRot(direction);
         onHandleDirUp: mainview.children[$pageNavigation.current].handleDirUp();
@@ -35,17 +35,14 @@ Item {
     // ===> Main Menu (m_current === 0)
     MainMenu {
         id: mainMenu;
-        objectName: "mainMenu"
         width: parent.width;
         height: Math.floor(parent.height*0.1);
         anchors.top: mainview.top;
         gridModel: $mainViewModel.listModel
 
-
         function handleDirDown(){
-            console.log("mainMenu.handleDirDown");
             handleLeave();
-            mainview.m_current = 1;
+            $pageNavigation.current=1;
             viewsSwitcher.handleEnter();
         }
     }
@@ -91,9 +88,7 @@ Item {
         id: viewSteerings
         width: parent.width;
         height: Math.floor(parent.height*0.15);
-        anchors {
-            bottom: statusBar.top;
-        }
+        anchors.bottom: statusBar.top;
         onBackToPrevious: { $pageNavigation.current=1; }
     }
 

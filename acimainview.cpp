@@ -10,7 +10,6 @@ ACIMainview::ACIMainview(QQuickView *parent) :
     m_pageNavigation = new ACIPageNavigation();
     this->rootContext()->setContextProperty("$mainViewModel", m_mainViewModel);
     this->rootContext()->setContextProperty("$pageNavigation", m_pageNavigation);
-    m_mainViewModel->setPageNavigation(m_pageNavigation);
 }
 
 //!
@@ -22,6 +21,24 @@ void ACIMainview::setQmlFile(QString qml) {
     connect(m_mainViewModel, SIGNAL(loadHome()), this, SLOT(loadHomeView()));
     connect(m_mainViewModel, SIGNAL(loadMedia()), this, SLOT(loadMediaView()));
     connect(m_mainViewModel, SIGNAL(loadSettings()), this, SLOT(loadSettingView()));
+}
+
+void ACIMainview::setup(ACISettings *settings, ACIMedia *media, ACISteerings *steerings) {
+    m_settings=settings;
+    m_media=media;
+    m_steerings=steerings;
+    connect(m_steerings, SIGNAL(play()), m_media, SLOT(play()));
+    connect(m_steerings, SIGNAL(volup()), m_media, SLOT(volup()));
+    connect(m_steerings, SIGNAL(voldown()), m_media, SLOT(voldown()));
+
+    connect(m_settings, SIGNAL(screenExit()), this, SLOT(loadMediaView()));
+
+    connect(this, SIGNAL(loadMedia()), m_media, SLOT(loadMedia()));
+    connect(m_media, SIGNAL(videoClicked()), this, SLOT(loadVideoView()));
+    //context properties must be loaded before loading the QML, if possible ;-)
+    this->rootContext()->setContextProperty("$settings", m_settings);
+    this->rootContext()->setContextProperty("$media", m_media);
+    this->rootContext()->setContextProperty("$steerings", m_steerings);
 }
 
 //!
@@ -208,7 +225,7 @@ void ACIMainview::wheelEvent(QWheelEvent *e) {
 }
 
 void ACIMainview::loadHomeView() {
-    m_pageNavigation->setCurrent(0);
+    m_pageNavigation->setCurrent(1);
     emit m_pageNavigation->loadView("ACIHomeView.qml");
 }
 
@@ -236,12 +253,24 @@ void ACIMainview::loadVideoView() {
 //!
 ACIMainViewModel::ACIMainViewModel(QObject *parent) : QObject(parent) {
     m_mainMenu = new ACIListModel();
-    m_mainMenu->addItem(new Item("home", ""));
-    m_mainMenu->addItem(new Item("media", "", "", "", "", QUrl("file:///D:/temp/ws/arcomivi/arcomivi/css/mainmenu/active/media013.png")));
-    m_mainMenu->addItem(new Item("navi", "", "", "", "", QUrl("file:///D:/temp/ws/arcomivi/arcomivi/css/mainmenu/active/navi013.png")));
-    m_mainMenu->addItem(new Item("sync", "", "", "", "", QUrl("file:///D:/temp/ws/arcomivi/arcomivi/css/mainmenu/active/sync013.png")));
-    m_mainMenu->addItem(new Item("options", "", "", "", "", QUrl("file:///D:/temp/ws/arcomivi/arcomivi/css/mainmenu/active/options013.png")));
-    connect(m_mainMenu, SIGNAL(itemClicked(Item*)), this, SLOT(listModelClicked(Item*)));
+    Item *item = new Item("home", "");
+    item->setText("Home");
+    connect(item, &Item::itemReleased, this, &ACIMainViewModel::loadHome);
+    m_mainMenu->addItem(item);
+
+    item = new Item("media", "", "", "", "", QUrl("file:///D:/temp/ws/arcomivi/arcomivi/css/mainmenu/active/media013.png"));
+    connect(item, &Item::itemReleased, this, &ACIMainViewModel::loadMedia);
+    m_mainMenu->addItem(item);
+
+    item = new Item("navi", "", "", "", "", QUrl("file:///D:/temp/ws/arcomivi/arcomivi/css/mainmenu/active/navi013.png"));
+    m_mainMenu->addItem(item);
+
+    item = new Item("sync", "", "", "", "", QUrl("file:///D:/temp/ws/arcomivi/arcomivi/css/mainmenu/active/sync013.png"));
+    m_mainMenu->addItem(item);
+
+    item = new Item("options", "", "", "", "", QUrl("file:///D:/temp/ws/arcomivi/arcomivi/css/mainmenu/active/options013.png"));
+    connect(item, &Item::itemReleased, this, &ACIMainViewModel::loadSettings);
+    m_mainMenu->addItem(item);
 }
 
 //!
@@ -249,27 +278,6 @@ ACIMainViewModel::ACIMainViewModel(QObject *parent) : QObject(parent) {
 //!
 ACIMainViewModel::~ACIMainViewModel() {
 
-}
-
-//!
-//! \brief ACIMainViewModel::listModelClicked
-//! \param itemClicked
-//!
-void ACIMainViewModel::listModelClicked(Item *itemClicked) {
-    TRACE(QString("Name: %1, Descr: %2, Value: %3")
-          .arg(itemClicked->name())
-          .arg(itemClicked->descr())
-          .arg(itemClicked->value()));
-
-    QString name = itemClicked->name();
-
-    if(name=="home") {
-        emit loadHome();
-    } else if(name.compare("media")==0) {
-        emit loadMedia();
-    } else if(name.compare("options")==0) {
-        emit loadSettings();
-    }
 }
 
 

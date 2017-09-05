@@ -1,39 +1,31 @@
 import QtQuick 2.5
 import ACIStyle 1.0
 Item {
-    id: standardListItem;
+    id: root;
     width: Math.floor(parent.width);
-    signal itemClicked(int index);
+    property var buttonModel;
 
-
-    //===============
-    //row: picture; column: text1, text2; text
-    //===============
-    //smaller text
     Rectangle {
-        height:parent.height; width: parent.width;
+        height:parent.height;
+        width: parent.width;
         color: "#636363"
         Text {
-            id: standardListItemText
+            id: text
             renderType: Text.NativeRendering
-            text: descr
+            text: buttonModel.descr
             font {
                 family: "Helvetica";
                 pixelSize: ACIStyle.listFontpixelSize
                 bold: true
             }
-            color: standardListItem.ListView.isCurrentItem ? "#B5C808" : (value2===""?"white": value2 )
-            anchors {
-                verticalCenter: parent.verticalCenter
-                horizontalCenter: parent.horizontalCenter
-            }
+            color: (buttonModel.active===true)?"#B5C808":(buttonModel.selected===false?"white": "black")
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.horizontalCenter: parent.horizontalCenter
         }
     }
 
     MouseArea {
         anchors.fill: parent
-        onClicked: {
-            standardListItem.itemClicked(index);
-        }
+        onClicked: buttonModel.released();
     }
 }

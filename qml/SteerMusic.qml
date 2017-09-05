@@ -23,33 +23,36 @@ Item {
     signal seek(int percentage)
 
     function handleEnter(){
-        steerMusicGrid.currentItem.setButtonActive();
+        steerMusicGrid.currentItem.buttonModel.active=true;
     }
 
     function handleLeave() {
-        steerMusicGrid.currentItem.setButtonInactive();
+        steerMusicGrid.currentItem.buttonModel.active=false;
     }
 
     function handleRotCw(){
+
         if(music_progress.borderWidth===1){ //we are on a progress bar
             return;
         }
-
+        steerMusicGrid.currentItem.buttonModel.active=false;
         if((steerMusicGrid.currentIndex + 1) < steerMusicGrid.count){
             steerMusicGrid.currentIndex = steerMusicGrid.currentIndex + 1;
         }
         steerMusicGrid.positionViewAtIndex(steerMusicGrid.currentIndex, GridView.Visible);
-
+        steerMusicGrid.currentItem.buttonModel.active=true;
     }
 
     function handleRotCcw(){
         if(music_progress.borderWidth===1){ //we are on a progress bar
             return;
         }
+        steerMusicGrid.currentItem.buttonModel.active=false;
         if((steerMusicGrid.currentIndex-1)  >=0){
             steerMusicGrid.currentIndex = steerMusicGrid.currentIndex-1;
         }
         steerMusicGrid.positionViewAtIndex(steerMusicGrid.currentIndex, GridView.Visible);
+        steerMusicGrid.currentItem.buttonModel.active=true;
     }
 
     function handleDirUp(){
@@ -80,10 +83,10 @@ Item {
 
 
     function handleRelease(){
-        aGridModel.listClicked(steerMusicGrid.currentIndex);
+        gridModel.listClicked(steerMusicGrid.currentIndex);
     }
 
-    property alias aGridModel: steerMusicGrid.model
+    property var gridModel;
 
 
     Column {
@@ -95,19 +98,12 @@ Item {
             width: parent.width; height: parent.height * 2 / 3;
             cellHeight: parent.height * 2 / 3;
             cellWidth: parent.width / steerMusicGrid.count
+            model: gridModel
             delegate: ACIButton {
                 height: parent.height
                 width: steerMusicGrid.cellWidth
-                pngname: name
-                text: ""
-                borderWidth.width: GridView.isCurrentItem ? 1:0;
-                btnImg: g_cssprefix + m_sPrefix + pngname +".png"
-                btnImgPressed: g_cssprefix + "css/media/inactive/"+pngname+".png"
+                buttonModel: model.itemData
 
-                onClicked: {
-                    steerMusicGrid.currentIndex = index;
-                    aGridModel.listClicked(steerMusicGrid.currentIndex);
-                }
             }
         }
 

@@ -1,89 +1,38 @@
 import QtQuick 2.5
 
 Item {
-    id: buttonRoot
+    id: root
     width: parent.width
     height: parent.height
-
     //signals
-    signal clicked(int index)
 
     //properties
-    property var buttonModel;
+    property var buttonModel
     property alias btnOpacity: buttonBorder.opacity
-    property alias text: btnText.text
-    property alias imgScale: buttonImage.scale
-    property string pngname
     property bool keyUsing: false
-    property alias borderWidth: buttonBorder.border
-    //property color borderColor: Qt.rgba(0.0, 0.0, 0.0, 0.0)
-
-
-    property int fontSize: 20
-    property int fontBaseSize: 12
-    property int fontDiff: 6
-
     property color textColor: "#D0D0D0"
-    property alias btnImgSrc: buttonImage.source;
-    property string btnImg: "";
-    property string btnImgPressed: "";
-    property bool wasClicked: false
-
-
 
     //functions
     function setButtonReleased(){
-        if(buttonBorder.border.width===0){
-            borderWidth.width = 1;
-        } else {
-            borderWidth.width = 0;
-        }
     }
 
     function setButtonClicked() {
-        buttonBorder.border.width = 2;
     }
 
     function setButtonInactive() {
-        activate();
     }
 
     function setButtonActive(){
-        activate();
     }
-    function activate(){
-        if(borderWidth===0){
-            borderWidth.width = 1;
-        } else {
-            borderWidth.width = 0;
-        }
-    }
-
-
 
     //border with rounded corners
     Rectangle {
         id: buttonBorder
         color: "#636363";
-        anchors.fill: buttonRoot
-        border.color: "orange"
-        border.width: 0;
-        radius: 0        
-    }
-
-    MouseArea {
-        id: mouseRegion
-        hoverEnabled: true
         anchors.fill: parent
-
-        onReleased: {
-            setButtonReleased();
-            buttonRoot.clicked(index);
-        }
-
-        onPressed: {
-            setButtonClicked();
-        }
+        border.color: "orange"
+        border.width: buttonModel.active===true?1:0;
+        radius: 0
     }
 
     Image {
@@ -96,16 +45,21 @@ Item {
     }
 
     Text {
-        id: btnText
+        id: buttonText
+        anchors.centerIn: parent
+        text: buttonModel.text
         renderType: Text.NativeRendering
         color: textColor
-        anchors.centerIn: buttonImage
-        style: Text.Raised
-        font {
-            pixelSize: fontSize;
-            bold: true
-        }
+        style: Text.Normal
+        font.pixelSize: 15;
+        font.bold: false
     }
 
+    MouseArea {
+        hoverEnabled: true
+        anchors.fill: parent
+        onReleased: buttonModel.released();
+        onPressed: { }
+    }
 
 }

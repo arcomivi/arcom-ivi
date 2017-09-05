@@ -16,7 +16,7 @@ ACIListModel::ACIListModel(QObject *parent)
 void ACIListModel::goUp(int index) {
     TRACE("enter");
     if(--index < 0) index++;
-    emit changeCurrentIndex(index);
+    emit currentIndexChanged(index);
     m_currentIndex=index;
     TRACE("exit");
 }
@@ -30,7 +30,7 @@ void ACIListModel::enter(int index) {
 void ACIListModel::goDown(int index) {
     TRACE("enter");
     if(++index >= m_items.count()) index--;
-    emit changeCurrentIndex(index);
+    emit currentIndexChanged(index);
     m_currentIndex=index;
     TRACE("exit");
 }
@@ -65,11 +65,14 @@ int ACIListModel::rowCount(const QModelIndex & parent) const {
     return m_items.count();
 }
 
-void ACIListModel::setCurrentIndex(int idx) {
-    emit changeCurrentIndex(idx);
+void ACIListModel::setCurrentIndex(int index) {
+    TRACE(QString("setCurrentIndex: %1").arg(index));
+    m_currentIndex=index;
+    emit currentIndexChanged(m_currentIndex);
 }
 
 QVariant ACIListModel::data(const QModelIndex & index, int role) const {
+    Q_UNUSED(role);
     if (index.row() < 0 || index.row() > m_items.count())
         return QVariant();
 
@@ -78,13 +81,16 @@ QVariant ACIListModel::data(const QModelIndex & index, int role) const {
 }
 
 bool ACIListModel::setData(const QModelIndex &index, const QVariant &value, int role) {
-    //    if (index.isValid() && role == ValueRole2) {
-    //        Item *item = m_items[index.row()];
-    //        item->setValue2(value.toString());
-    //        m_items.replace(index.row(), item);
-    //        emit dataChanged(index, index);
-    //        return true;
-    //    }
+    TRACE(QString("%1: %2").arg(__FUNCTION__).arg(value.toBool()));
+    Q_UNUSED(role);
+    if (index.isValid()) {
+        Item *item = m_items[index.row()];
+        item->setSelected(value.toBool());
+        TRACE(QString("%1").arg(item->descr()));
+        m_items.replace(index.row(), item);
+        emit dataChanged(index, index);
+        return true;
+    }
     return false;
 }
 
@@ -118,17 +124,35 @@ Qt::ItemFlags ACIListModel::flags(const QModelIndex &index) const {
     return QAbstractItemModel::flags(index) | Qt::ItemIsEditable;
 }
 
-Item::Item(const QString &name, const QString &descr, const QString &value, const QString &icon, const QString &value2, QUrl imageSource, QObject *parent)
+Item::Item(const QString &name, const QString &descr, const QString &value, const QString &icon, bool selected, QUrl imageSource, QObject *parent)
     : QObject(parent)
     , m_name(name)
     , m_descr(descr)
     , m_value(value)
     , m_icon(icon)
-    , m_value2(value2)
-    , m_imageSource(imageSource) {
+    , m_selected(selected)
+    , m_imageSource(imageSource)
+    , m_active(false) {
 
 }
 
 QUrl Item::imageSource() const {
     return m_imageSource;
+}
+
+bool Item::active() const {
+    return m_active;
+}
+
+void Item::setActive(bool active) {
+    m_active = active;
+    emit activeChanged(m_active);
+}
+
+QString Item::text() const {
+    return m_text;
+}
+
+void Item::setText(const QString &text) {
+    m_text = text;
 }

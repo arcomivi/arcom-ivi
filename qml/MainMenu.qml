@@ -12,48 +12,48 @@ Item {
 
     // ==> functions
     function handleLeave() {
+        mainMenuGrid.currentItem.buttonModel.active=false;
         if(m_current===-1) { m_current = 0; }
-        mainMenuRow.children[m_current].setButtonInactive();
     }
 
     function handleDirUp(){
     }
 
     function handleEnter() {
+        console.log("mainMenuGrid.currentIndex:"+mainMenuGrid.currentIndex);
+        console.log("mainMenuGrid.currentItem:"+mainMenuGrid.currentItem);
+        mainMenuGrid.currentItem.buttonModel.active=true;
         if(m_current===-1) { m_current = 0; }
-//        mainMenuRow.children[m_current].setButtonActive();
+
     }
 
     function handleRelease(){
-        gridModel.listClicked(mainMenuGrid.currentIndex);
-        console.log(gridModel[mainMenuGrid.currentIndex]);
+        mainMenuGrid.currentItem.buttonModel.released();
+        mainMenuGrid.currentItem.buttonModel.active=false;
     }
 
     function handlePush(){
         switch(m_current){
         case 0:
-            mainMenuRow.children[m_current].setButtonClicked();
             break;
         case 1:
-            mainMenuRow.children[m_current].setButtonClicked();
             break;
         case 2:
-            mainMenuRow.children[m_current].setButtonClicked();
             break;
         case 3:
-            mainMenuRow.children[m_current].setButtonClicked();
             break;
         }
     }
 
     function handleRot(direction){
         if(m_current===-1) { m_current = 0; }
-
+        mainMenuGrid.currentItem.buttonModel.active=false;
         if(direction===0){
             handleRotCw();
         } else {
             handleRotCcw();
         }
+        mainMenuGrid.currentItem.buttonModel.active=true;
     }
 
     function handleRotCw(){
@@ -80,13 +80,7 @@ Item {
         delegate: ACIButton {
             height: parent.height
             width: mainMenuGrid.cellWidth
-            buttonModel: model.itemData;
-            text: index!=0?"":"HOME"
-            borderWidth.width: GridView.isCurrentItem ? 1:0;
-            onClicked: {
-                mainMenuGrid.currentIndex = index;
-                gridModel.listClicked(mainMenuGrid.currentIndex);
-            }
+            buttonModel: model.itemData
         }
     }
 }

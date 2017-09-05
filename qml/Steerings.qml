@@ -114,6 +114,11 @@ Rectangle {
         steerSwitcher.jumpTo(idx);
     }
 
+    function loadSteering(steering) {
+        steerSwitcher.jumpTo(steering);
+        currentSteering = steerSwitcher.pages[steering];
+    }
+
     function goToSteering(category) {
         if(category===99){
             console.log(steerSwitcher.pages.length);
@@ -159,7 +164,7 @@ Rectangle {
             //0
             SteerMusic {
                 id: steerMusic;
-                aGridModel: $steerings.steerMusicModel
+                gridModel: $steerings.steerMusicModel
 
                 onSeek: steerings.seekMusic(percentage);
                 onGoUp: {

@@ -4,6 +4,9 @@
 #include "aciconfig.h"
 #include "acilistmodel.h"
 #include "acipagenavigation.h"
+#include "acisettings.h"
+#include "acisteerings.h"
+#include "acimedia.h"
 
 class ACIMainViewModel : public QObject {
         Q_OBJECT
@@ -15,9 +18,6 @@ class ACIMainViewModel : public QObject {
         ACIListModel* getModel() {
             return m_mainMenu;
         }
-        void setPageNavigation(ACIPageNavigation *pageNav) {
-            m_pageNavigation=pageNav;
-        }
 
     signals:
         void listModelChanged(QObject* aNewModel);
@@ -25,10 +25,9 @@ class ACIMainViewModel : public QObject {
         void loadMedia();
         void loadSettings();
     private slots:
-        void listModelClicked(Item *itemClicked);
+
     private:
         ACIListModel *m_mainMenu;
-        ACIPageNavigation *m_pageNavigation;
 };
 
 
@@ -37,6 +36,7 @@ class ACIMainview : public QQuickView {
     public:
         explicit ACIMainview(QQuickView *parent = 0);
         void setQmlFile(QString qml);
+        void setup(ACISettings *settings, ACIMedia *media, ACISteerings *steerings);
         ACIPageNavigation *getPageNav() {
             return m_pageNavigation;
         }
@@ -57,6 +57,9 @@ class ACIMainview : public QQuickView {
     private:
         ACIMainViewModel *m_mainViewModel;
         ACIPageNavigation *m_pageNavigation;
+        ACISettings *m_settings;
+        ACIMedia *m_media;
+        ACISteerings *m_steerings;
 };
 
 #endif // ACIMAINVIEW_H

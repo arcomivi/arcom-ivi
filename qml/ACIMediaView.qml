@@ -13,18 +13,21 @@ Item {
     // ==> functions
     function handleDirUp(){
         goUp();
-    }    
+    }
 
     function handleRelease() {
-        list.model.listClicked(list.currentIndex);
+        list.currentItem.buttonModel.released();
     }
 
     function handleRot(direction){
+        list.currentItem.buttonModel.active=false;
         if(direction === 0){
             rotateCW();
         } else {
             rotateCCW();
         }
+        list.currentItem.buttonModel.active=true;
+        $media.listModel.currentIndex=list.currentIndex;
     }
 
     function rotateCW(){
@@ -42,7 +45,7 @@ Item {
     }
 
     // ==> QML elements
-    Rectangle { id: acimediaviewbackground; anchors.fill: parent; color: "#636363" }
+    Rectangle { anchors.fill: parent; color: "#636363" }
 
     ListView {
         id: list;
@@ -51,15 +54,9 @@ Item {
         focus: true
         anchors.fill: parent;
         clip: true;
-        delegate:
-            ACIStandardListItem {
+        delegate: ACIStandardListItem {
+            buttonModel: model.itemData
             height: Math.floor(list.height / 5);
-
-            onItemClicked: {
-                list.currentIndex = index;
-                $media.listModel.listClicked(list.currentIndex);
-//                console.log("onItemClicked:"+descr);
-            }
         }
 
         Component.onCompleted: {

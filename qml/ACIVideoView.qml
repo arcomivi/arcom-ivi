@@ -97,7 +97,6 @@ Item {
             height: parent.height
             width: steerVideoGrid.cellWidth
             btnOpacity: 0.5
-            borderWidth.width: GridView.isCurrentItem ? 1:0;
             btnImg: g_cssprefix + m_sPrefix + name +".png"
             btnImgPressed: g_cssprefix + "css/media/inactive/"+name+".png"
 

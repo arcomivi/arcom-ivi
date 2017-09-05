@@ -7,62 +7,41 @@
 ACIMainController::ACIMainController(QObject *parent) : QObject(parent) {
     m_videoView = Q_NULLPTR;
     m_ctrlFirstRun=false;
+    m_pageNavigation = Q_NULLPTR;
+    m_settings = new ACISettings();
+    m_media = new ACIMedia();
+    m_steerings = new ACISteerings();
+
+    m_mainView = new ACIMainview();
+    m_mainView->setup(m_settings, m_media, m_steerings);
+    m_pageNavigation=m_mainView->getPageNav();
 }
 
 //!
 //! \brief ACIMainController::run - start the main application
 //!
 void ACIMainController::run() {
-
-    m_pageNavigation = Q_NULLPTR;
-    m_settings = new ACISettings();
-    m_media = new ACIMedia();
-    m_steerings = new ACISteerings();
-
     //signals from objects:
-    connect(m_settings, SIGNAL(update()), m_settings, SLOT(updateMe()));
     connect(m_settings, SIGNAL(screenSelected(int)), this, SLOT(screenSelected(int)));
-
-
-    connect(m_steerings, SIGNAL(play()), m_media, SLOT(play()));
-    connect(m_steerings, SIGNAL(volup()), m_media, SLOT(volup()));
-    connect(m_steerings, SIGNAL(voldown()), m_media, SLOT(voldown()));
 
     QObject::connect(ACIUsbController::getInstance(), SIGNAL(broadcastCtrlEvent(QString)), this, SLOT(onBroadcastCtrlEvent(QString)));
     QTimer::singleShot(500, ACIUsbController::getInstance(), SLOT(connectCtrlSignal()));
 
     //    gets information of the available desktops screens
     QDesktopWidget *desktopWidget = QApplication::desktop();
-
-    m_mainView = new ACIMainview();
-    m_pageNavigation=m_mainView->getPageNav();
-
-    connect(m_settings, SIGNAL(screenExit()), m_mainView, SLOT(loadMediaView()));
     //w.setAttribute(Qt::WA_TranslucentBackground);
     //w.setAutoFillBackground(false);
     //w.setAttribute(Qt::WA_OpaquePaintEvent, true);
     //w.setAttribute(Qt::WA_NoSystemBackground);
 
-    connect(m_mainView, SIGNAL(loadMedia()), m_media, SLOT(loadMedia()));
-    connect(m_media, SIGNAL(videoClicked()), m_mainView, SLOT(loadVideoView()));
-
-    //context properties must be loaded before loading the QML, if possible ;-)
-    m_mainView->rootContext()->setContextProperty("$settings", m_settings);
-    m_mainView->rootContext()->setContextProperty("$media", m_media);
-    m_mainView->rootContext()->setContextProperty("$steerings", m_steerings);
-
-
-
     m_mainView->setQmlFile(ACIConfig::instance()->getQmlPrefix()+"MainView.qml");
     m_mainView->setFlags(Qt::FramelessWindowHint);
     m_mainView->setResizeMode(QQuickView::SizeRootObjectToView);
-
     m_mainView->setGeometry(ACIConfig::instance()->getx(),
                             ACIConfig::instance()->gety(),
                             ACIConfig::instance()->getw()==0?desktopWidget->screenGeometry(0).width():ACIConfig::instance()->getw(),
                             ACIConfig::instance()->geth()==0?desktopWidget->screenGeometry(0).height():ACIConfig::instance()->geth());
     m_mainView->show();
-
 }
 
 //!
@@ -102,7 +81,7 @@ void ACIMainController::exitVideo() {
     //    m_oVideoView->hide();
     //    this->show();
     m_videoView->destroy();
-    m_videoView = 0;
+    m_videoView = Q_NULLPTR;
     m_pageNavigation=m_mainView->getPageNav();
 }
 
