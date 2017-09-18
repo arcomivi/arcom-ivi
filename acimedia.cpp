@@ -61,8 +61,9 @@ void ACIMedia::voldown() {
 
 void ACIMedia::play() {
     TRACE(QString("play/pause"));
-    m_mediaModel->listClicked(m_mediaModel->currentIndex());
+    songClicked();
 }
+
 /**
  * @brief ACIMedia::currentListIndexChanged
  * @param listIndex
@@ -106,80 +107,7 @@ void ACIMedia::loadSongs(QString path) {
 }
 
 
-//!
-//! \brief ACIMedia::mediaModelClicked
-//! \param itemClicked
-//!
-//void ACIMedia::mediaModelClicked(Item *itemClicked) {
-//    TRACE(QString("Name: %1, Descr: %2, Value: %3")
-//          .arg(itemClicked->name())
-//          .arg(itemClicked->descr())
-//          .arg(itemClicked->value()));
 
-//    QString name = itemClicked->name();
-//    if(name.compare("MEDIA_INITIAL")==0) {
-//        m_iMediaType=MEDIA_INITIAL;
-//        emit mediaChanged();
-//    } else if(name.compare("MEDIA_MUSIC")==0) {
-//        m_iMediaType=MEDIA_MUSIC;
-//        m_iMusicType=MUSIC_INITIAL;
-//        displayMusic();
-//    } else if(name.compare("MUSIC_ALL_SONGS")==0) {
-//        m_iMusicType=MUSIC_ALL_SONGS;
-//        displayMusic();
-//    } else if(name.compare("SONG")==0) {
-//        if(m_bNewPlaylist) {
-//            m_musicPlayingPlaylist->clear();
-//            m_musicPlayingPlaylist->addMedia(m_songList);
-//            m_musicPlayingPlaylist->setCurrentIndex(m_mediaModel->currentIndex()==0?0:m_mediaModel->currentIndex()-1);
-//            m_musicPlayer->setPlaylist(m_musicPlayingPlaylist);
-//            m_bNewPlaylist = false;
-//        }
-//        m_musicPlayer->playPause(m_mediaModel->currentIndex()==0?0:m_mediaModel->currentIndex()-1);
-//        if(m_previousListIndex!=-1) {
-//            m_mediaModel->setData(m_mediaModel->index(m_previousListIndex),QVariant(""));
-//        }
-//        m_mediaModel->setData(m_mediaModel->index(m_mediaModel->currentIndex()),QVariant("black"));
-//        m_previousListIndex = m_mediaModel->currentIndex();
-//    } else if(name.compare("MEDIA_VIDEO")==0) {
-//        m_iMediaType=MEDIA_VIDEO;
-//        m_iVideoType=VIDEO_INITIAL;
-//        emit mediaChanged();
-//    } else if(name.compare("VIDEO_ALL_VIDEOS")==0) {
-//        m_iMediaType=MEDIA_VIDEO;
-//        m_iVideoType=VIDEO_ALL_VIDEOS;
-//        emit mediaChanged();
-//    } else if(name.compare("VIDEO")==0) {
-//        m_sCurrentVideo = itemClicked->value();
-//        emit videoClicked();
-
-//    }
-//    TRACE("exit");
-//}
-
-/** ===============================
- *  displayMusic - description
- */
-//void ACIMedia::displayMusic() {
-//    TRACE(QString("enter: %1").arg(m_iMusicType));
-
-//    switch(m_iMusicType) {
-//        case MUSIC_INITIAL:
-//            emit mediaChanged();
-//            break;
-//        case MUSIC_ALL_ALBUMS:
-//            //        emit mediaChanged();
-//            break;
-//        case MUSIC_ALL_SONGS:
-//            emit mediaChanged();
-//            break;
-//        case MUSIC_SONGS_ARTIST_ALBUM:
-//            break;
-//        default:
-//            break;
-//    }
-//    TRACE("exit");
-//}
 
 void ACIMedia::displayInitialMusic() {
     m_mediaModel->removeRows(0, m_mediaModel->rowCount());
@@ -281,11 +209,11 @@ void ACIMedia::displayAllVideos() {
 
 void ACIMedia::displayInitialMedia() {
     m_mediaModel->removeRows(0, m_mediaModel->rowCount());
-    Item *item = new Item("MEDIA_MUSIC", "Music", "music", "folder");
+    Item *item = new Item("MEDIA_MUSIC", "Music", "music", "folder", false, QUrl("file:///D:/temp/ws/arcomivi/arcomivi/css/media/active/audio-small.png"));
     connect(item, &Item::itemReleased, this, &ACIMedia::displayInitialMusic);
     m_mediaModel->addItem(item);
     m_mediaModel->addItem(new Item("MEDIA_RADIO", "Radio", "radio", "folder"));
-    m_mediaModel->addItem(new Item("MEDIA_VIDEO", "Video", "video", "folder"));
+    m_mediaModel->addItem(new Item("MEDIA_VIDEO", "Video", "video", "folder", false, QUrl("file:///D:/temp/ws/arcomivi/arcomivi/css/media/active/video-small.png")));
     m_mediaModel->addItem(new Item("MEDIA_PICTURE", "Pictures", "picture", "folder"));
     m_mediaModel->addItem(new Item("MEDIA_TV", "TV", "tv", "folder"));
 }

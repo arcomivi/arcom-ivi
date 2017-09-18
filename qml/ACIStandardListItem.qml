@@ -9,6 +9,11 @@ Item {
         height:parent.height;
         width: parent.width;
         color: "#636363"
+        Image {
+            anchors.verticalCenter: parent.verticalCenter
+            source: buttonModel.imageSource
+        }
+
         Text {
             id: text
             renderType: Text.NativeRendering
@@ -26,6 +31,6 @@ Item {
 
     MouseArea {
         anchors.fill: parent
-        onClicked: buttonModel.released();
+        onReleased: { list.currentIndex=index; list.model.currentIndex=index; buttonModel.released(); }
     }
 }

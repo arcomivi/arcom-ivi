@@ -1,14 +1,10 @@
 import QtQuick 2.5
-//import QtQuick.Controls 1.4
 
 Item {
-    id: rootSteerMusic
+    id: root
     width: parent.width
     height: parent.height
-
-    property int noOfElements: 5
-    property int m_iCurrent: -1;
-    property string m_sPrefix: "css/media/active/10/"
+    property var gridModel;
     property Item currentItem
 
     signal goRight
@@ -81,13 +77,9 @@ Item {
         else if(music_progress.borderWidth==1) music_progress.borderWidth=0;
     }
 
-
     function handleRelease(){
-        gridModel.listClicked(steerMusicGrid.currentIndex);
+        steerMusicGrid.currentItem.buttonModel.released();
     }
-
-    property var gridModel;
-
 
     Column {
         width: parent.width
@@ -103,7 +95,6 @@ Item {
                 height: parent.height
                 width: steerMusicGrid.cellWidth
                 buttonModel: model.itemData
-
             }
         }
 
@@ -112,26 +103,7 @@ Item {
 
             width: parent.width;
             height: parent.height / 3;
-            onSeek: { rootSteerMusic.seek(percentage); }
+            onSeek: { root.seek(percentage); }
         }
-
-
-//            ACIButton {
-//                width: parent.width / noOfElements
-//                height: parent.height
-//                id: audio_bt_volup
-//                keyUsing: true;
-//                opacity: 1
-//                pngname: "volup"
-//                text: ""
-//                btnImg: g_cssprefix + m_sPrefix + pngname +".png"
-//                btnImgPressed: g_cssprefix + "css/media/inactive/"+pngname+".png"
-//                function setActive()   { setButtonActive();   }
-//                function setInactive() { setButtonInactive(); }
-//                function setClicked()  { setButtonClicked();  }
-//                onClicked: { rootSteerMusic.volup(); wasClicked = false; }
-//            }
-
-
     }
 }

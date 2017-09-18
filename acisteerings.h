@@ -23,6 +23,8 @@ class ACISteerings : public QObject {
         void play();
         void volup();
         void voldown();
+        void previous();
+        void next();
 
     public slots:
 

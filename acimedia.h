@@ -15,9 +15,6 @@ class ACIMedia : public QObject {
         explicit ACIMedia(QObject *parent = 0);
         ACIListModel* getModel();
 
-        //        void displayMusic();
-
-
 
         void displayInitialVideo();
         void displayAllVideos();
@@ -64,7 +61,6 @@ class ACIMedia : public QObject {
         }
 
         void loadMedia();
-        //        void mediaModelClicked(Item *itemClicked);
         void volup();
         void voldown();
         void play();

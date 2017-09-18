@@ -98,8 +98,6 @@ Item {
         id: statusBar;
         width: parent.width;
         height: Math.floor(parent.height*0.05);
-        anchors {
-            bottom: mainview.bottom;
-        }
+        anchors.bottom: mainview.bottom;
     }
 }
