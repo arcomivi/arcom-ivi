@@ -45,7 +45,10 @@ Item {
     }
 
     // ==> QML elements
-    Rectangle { anchors.fill: parent; color: "#636363" }
+    Rectangle { anchors.fill: parent;
+        //color: "#636363"
+        color: "transparent"
+    }
 
     ListView {
         id: list;

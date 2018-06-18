@@ -28,7 +28,7 @@ Item {
     //border with rounded corners
     Rectangle {
         id: buttonBorder
-        color: "#636363";
+        color: "transparent"//"#636363";
         anchors.fill: parent
         border.color: "orange"
         border.width: buttonModel.active===true?1:0;

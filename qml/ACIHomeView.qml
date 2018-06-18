@@ -5,7 +5,9 @@ Item {
     objectName: "ACIHomeView.qml"
     visible: true;
     anchors.fill: parent;
-    Rectangle { color: "#636363"; anchors.fill: parent;
+    Rectangle {
+        color: "transparent"//"#636363";
+        anchors.fill: parent;
         Text {
             id: viewHomeText;
             renderType: Text.NativeRendering

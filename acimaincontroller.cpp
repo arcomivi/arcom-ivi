@@ -25,7 +25,7 @@ void ACIMainController::run() {
     connect(m_settings, SIGNAL(screenSelected(int)), this, SLOT(screenSelected(int)));
 
     QObject::connect(ACIUsbController::getInstance(), SIGNAL(broadcastCtrlEvent(QString)), this, SLOT(onBroadcastCtrlEvent(QString)));
-    QTimer::singleShot(500, ACIUsbController::getInstance(), SLOT(connectCtrlSignal()));
+    QTimer::singleShot(500, ACIUsbController::getInstance(), &ACIUsbController::connectCtrlSignal);
 
     //    gets information of the available desktops screens
     QDesktopWidget *desktopWidget = QApplication::desktop();
@@ -35,7 +35,7 @@ void ACIMainController::run() {
     //w.setAttribute(Qt::WA_NoSystemBackground);
 
     m_mainView->setQmlFile(ACIConfig::instance()->getQmlPrefix()+"MainView.qml");
-    m_mainView->setFlags(Qt::FramelessWindowHint);
+    m_mainView->setFlags(Qt::FramelessWindowHint|Qt::WindowStaysOnTopHint);
     m_mainView->setResizeMode(QQuickView::SizeRootObjectToView);
     m_mainView->setGeometry(ACIConfig::instance()->getx(),
                             ACIConfig::instance()->gety(),

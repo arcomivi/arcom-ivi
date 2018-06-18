@@ -7,6 +7,11 @@ Item {
     property int m_current: -1
     property string g_cssprefix: Qt.platform.os==="windows"?"file:///D:/temp/ws/arcomivi/arcomivi/":"/usr/share/arcomivi/";
 
+    Image {
+        id: background
+        source: g_cssprefix + "/css/common/wallpaper640x480-flat.png"
+        anchors.fill: parent
+    }
     //  ==> functions
     Connections {
         target: $media
@@ -16,7 +21,7 @@ Item {
         target: $pageNavigation
         onLoadView: {
             console.log("LoadView: "+view);
-            viewsSwitcher.goToView(0, view);
+            viewsSwitcher.goToView(view);
             mainview.children[$pageNavigation.current].handleEnter();
         }
         onLoadSteering: viewSteerings.loadSteering(steering);
@@ -52,7 +57,7 @@ Item {
         id: viewsSwitcher
         width: parent.width;
         height: Math.floor(parent.height*0.7);
-        anchors.top: mainMenu.bottom;        
+        anchors.top: mainMenu.bottom;
 
         function handleDirUp(){
             handleLeave();
@@ -66,12 +71,8 @@ Item {
             viewSteerings.goToSteering(0)
         }
 
-        function goToView(view, qmlname){
-            if(viewsSwitcher.exists(qmlname)===false){
-                var cmp = Qt.createComponent(qmlname);
-                cmp.createObject(viewsSwitcher.itemObject, {})
-            }
-            jumpTo(view, qmlname);
+        function goToView(qmlname){
+            jumpTo(qmlname);
         }
 
         pages: [

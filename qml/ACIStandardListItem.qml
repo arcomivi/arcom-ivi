@@ -8,7 +8,8 @@ Item {
     Rectangle {
         height:parent.height;
         width: parent.width;
-        color: "#636363"
+        //color: "#636363"
+        color: "transparent"
         Image {
             anchors.verticalCenter: parent.verticalCenter
             source: buttonModel.imageSource
@@ -34,3 +35,4 @@ Item {
         onReleased: { list.currentIndex=index; list.model.currentIndex=index; buttonModel.released(); }
     }
 }
+

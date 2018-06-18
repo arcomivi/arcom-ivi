@@ -17,7 +17,7 @@ Item {
     Rectangle {
         id: status_bar_rect
         width: parent.width; height: parent.height;
-        color: "#636363"
+        color: "transparent"//"#636363"
 
         Text {
             id: txt_song_time

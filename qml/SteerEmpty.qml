@@ -10,7 +10,9 @@ Item {
     property string btnPrefix: "empty-bt-"
     property int m_current: -1
 
-    Rectangle { color: "#636363"; anchors.fill: parent;
+    Rectangle {
+        color: "transparent"//"#636363";
+        anchors.fill: parent;
         Image {
             id: logo
             height: parent.height / 2;

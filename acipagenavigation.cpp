@@ -18,9 +18,8 @@ ACIPageNavigation::~ACIPageNavigation() {
 //!
 //! \brief ACIPageNavigation::init
 //!
-void ACIPageNavigation::init()
-{
+void ACIPageNavigation::init() {
     TRACE("init page navigation...");
-    m_current=0;
+    m_current=1;
     emit loadView("ACIHomeView.qml");
 }

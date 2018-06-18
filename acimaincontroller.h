@@ -18,15 +18,16 @@ class ACIMainController : public QObject {
     public:
         explicit ACIMainController(QObject *parent = Q_NULLPTR);
         void run();
-    signals:
+    Q_SIGNALS:
 
-    public slots:
+    public Q_SLOTS:
 
-    private slots:
+    private Q_SLOTS:
         void screenSelected(int);
         void exitVideo();
         void navigateTo(int widget);
         void onBroadcastCtrlEvent(QString event);
+
     private:
         ACIUsbCtrlSignals m_ctrlSignal, m_ctrlPreviousSignal;
         QString m_previousSignal;
