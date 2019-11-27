@@ -258,7 +258,7 @@ ACIMainViewModel::ACIMainViewModel(QObject *parent) : QObject(parent) {
     connect(item, &Item::itemReleased, this, &ACIMainViewModel::loadHome);
     m_mainMenu->addItem(item);
 
-    item = new Item("media", "", "", "", "", QUrl("file:///D:/temp/ws/arcomivi/arcomivi/css/mainmenu/active/media013.png"));
+    item = new Item("media", "", "", "", "", QUrl("file:///H:/Qt/ws/arcom-ivimnmmm..,.,s/css/mainmenu/active/media013.png"));
     connect(item, &Item::itemReleased, this, &ACIMainViewModel::loadMedia);
     m_mainMenu->addItem(item);
 

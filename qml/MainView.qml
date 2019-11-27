@@ -5,7 +5,7 @@ Item {
     id: mainview
     // ==> properties
     property int m_current: -1
-    property string g_cssprefix: Qt.platform.os==="windows"?"file:///D:/temp/ws/arcomivi/arcomivi/":"/usr/share/arcomivi/";
+    property string g_cssprefix: Qt.platform.os==="windows"?"file:///H:/Qt/ws/arcom-ivi/":"/usr/share/arcomivi/";
 
     Image {
         id: background
